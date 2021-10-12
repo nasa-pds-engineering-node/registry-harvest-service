@@ -40,9 +40,11 @@
 *.a
 
 # Eclipse files
-.settings/
-*.project
-*.classpath
+.settings
+.project
+.classpath
+.externalToolBuilders 
+maven-eclipse.xml 
 
 # IntelliJ files
 .idea/
@@ -51,31 +53,13 @@
 # Sublime Text files
 *.sublime-*
 
-# Shared objects (inc. Windows DLLs)
-*.dll
-*.so
-*.so.*
-*.dylib
-
-# Executables
-*.exe
-*.out
-*.app
-
 # Temporary files
 *~
 .*.swp
 var/
 
-# other stuff
-*.xpr
-*.swp
-bin/
-typescript
-
 # Java stuff
 *.javac
-.gwt/
 target/
 
 # macOS specific stuff
