@@ -58,34 +58,22 @@ Go through this file line-by-line and replace the template values with your own.
         <version>1.12.0</version>
     </parent>
   
-    <!-- My project metadata here -->
     <properties>
-        <!-- Obviously put in your own project name instead of `myproject` -->
         <project-name>Big Data Harvest</project-name>
-
-        <!-- You'll want a Unicode-type encoding here in almost every case -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <log4j.version>2.14.1</log4j.version>
     </properties>
 
-    <!--
-    Maven "coordinates" that identify this package uniquely in the entire universe; the group identifies an 
-    organizational unit (by reverse domain name) that produced the artifact:
-    -->
     <groupId>gov.nasa.pds</groupId>
-    <!--
-    The next part of the Maven coorindate is the name of the artifact, its "artifact ID". Note we cannot use
-    any expression here, as tempting as it would be to use ${project-name} here:
-    -->
     <artifactId>big-data-harvest</artifactId>
-    <!-- The third part of the Maven coorindate is the version identifier of the artifact: -->
     <version>1.0.0-SNAPSHOT</version>
-    <!-- The final part is the kind: here we make a `jar`, but there's `war`, `ejb`, `ear`, `maven-plugin`, etc.: -->
     <packaging>jar</packaging>
 
     <name>${project.groupId}:${project-name}</name>
     <description>
         Put a short paragraph-sized summary of the project here.
     </description>
+
     <!-- Check the calendar -->
     <inceptionYear>2021</inceptionYear>
     <url>https://nasa-pds.github.io/${project-name}</url>
@@ -100,7 +88,6 @@ Go through this file line-by-line and replace the template values with your own.
         <tag>main</tag>
     </scm>
 
-    <!-- Put the packages your project depends on here -->
     <dependencies>
         <!-- TEST ONLY: JUnit -->
         <dependency>
@@ -119,12 +106,17 @@ Go through this file line-by-line and replace the template values with your own.
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
-            <version>2.13.3</version>
+            <version>${log4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
-            <version>2.13.3</version>
+            <version>${log4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+            <version>${log4j.version}</version>
         </dependency>
         <!-- JSON parser / generator -->
         <dependency>
@@ -137,6 +129,12 @@ Go through this file line-by-line and replace the template values with your own.
             <groupId>com.rabbitmq</groupId>
             <artifactId>amqp-client</artifactId>
             <version>5.13.1</version>
+        </dependency>
+        <!-- Web server -->
+        <dependency>
+            <groupId>io.undertow</groupId>
+            <artifactId>undertow-core</artifactId>
+            <version>2.0.41.Final</version>
         </dependency>
     </dependencies>
 

@@ -9,7 +9,6 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 
 import gov.nasa.pds.harvest.util.Log4jConfigurator;
 import gov.nasa.pds.harvest.util.ManifestUtils;
@@ -65,7 +64,7 @@ public class HarvestServerMain
             HarvestServer server = new HarvestServer(cmdLine.getOptionValue("c"));
             return server;
         }
-        catch(ParseException ex)
+        catch(Exception ex)
         {
             System.out.println("[ERROR] " + ex.getMessage());
             System.exit(1);

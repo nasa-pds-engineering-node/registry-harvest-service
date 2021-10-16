@@ -63,8 +63,7 @@
       <directory>src/main/resources/bin</directory>
       <outputDirectory>bin</outputDirectory>
       <includes>
-        <include>harvest.bat</include>
-        <include>harvest</include>
+        <include>harvest-server.bat</include>
       </includes>
       <fileMode>775</fileMode>
       <lineEnding>dos</lineEnding>
@@ -77,7 +76,7 @@
       <directory>src/main/resources/bin</directory>
       <outputDirectory>bin</outputDirectory>
       <includes>
-        <include>harvest</include>
+        <include>harvest-server</include>
       </includes>
       <fileMode>775</fileMode>
       <lineEnding>unix</lineEnding>
