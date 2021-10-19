@@ -18,6 +18,7 @@ import gov.nasa.pds.harvest.http.StatusHandler;
 import gov.nasa.pds.harvest.mq.FilesConsumer;
 import gov.nasa.pds.harvest.util.CloseUtils;
 import gov.nasa.pds.harvest.util.ExceptionUtils;
+import gov.nasa.pds.harvest.util.ThreadUtils;
 import io.undertow.Undertow;
 
 
@@ -107,23 +108,11 @@ public class HarvestServer
             catch(Exception ex)
             {
                 log.warn("Could not connect to RabbitMQ. " + ex + ". Will retry in 10 sec.");
-                sleepSec(10);
+                ThreadUtils.sleepSec(10);
             }
         }
 
         log.info("Connected to RabbitMQ");
     }
-    
-    
-    private static void sleepSec(int sec)
-    {
-        try
-        {
-            Thread.sleep(sec * 1000);
-        }
-        catch(InterruptedException ex)
-        {
-            // Ignore
-        }
-    }
+        
 }

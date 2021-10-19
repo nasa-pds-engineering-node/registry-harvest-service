@@ -1,12 +1,8 @@
 package gov.nasa.pds.harvest.cfg;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.Reader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.util.StringTokenizer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,104 +15,133 @@ public class ConfigurationReader
     private static final String PROP_MQ_HOST = "mq.host";
     private static final String PROP_WEB_PORT = "web.port";
     
-    private static final String DEFAULT_MQ_HOST = "localhost:5672";
-    private static final String DEFAULT_WEB_PORT = "8002";
+    private static final String PROP_ES_URL = "es.url";
+    private static final String PROP_ES_INDEX = "es.index";
+    private static final String PROP_ES_AUTH = "es.authFile";
+        
+    private static final IPAddress DEFAULT_MQ_HOST = new IPAddress("localhost", 5672);
+    private static final int DEFAULT_WEB_PORT = 8002;
     
     private Logger log;
-    
+
     
     public ConfigurationReader()
     {
         log = LogManager.getLogger(this.getClass());
     }
 
-    
+
     public Configuration read(File file) throws Exception
+    {
+        Configuration cfg = parseConfigFile(file);
+    
+        // Validate web port
+        if(cfg.webPort == 0)
+        {
+            cfg.webPort = DEFAULT_WEB_PORT;
+            String msg = String.format("'%s' property is not set. Will use default value: %d", PROP_WEB_PORT, cfg.webPort);
+            log.warn(msg);
+        }
+        
+        // Validate MQ address
+        if(cfg.mqAddresses.isEmpty())
+        {
+            cfg.mqAddresses.add(DEFAULT_MQ_HOST);
+            String msg = String.format("'%s' property is not set. Will use default value: %s", 
+                    PROP_WEB_PORT, DEFAULT_MQ_HOST.toString());
+            log.warn(msg);
+        }
+        
+        return cfg;
+    }
+    
+    
+    private Configuration parseConfigFile(File file) throws Exception
     {
         Configuration cfg = new Configuration();
         
-        Reader rd = null;
+        BufferedReader rd = null;
         try
         {
-            // Read properties from a file 
-            Properties props = new Properties();
-            rd = new FileReader(file);
-            props.load(rd);
-            
-            // Parse web port
-            cfg.webPort = parseWebPort(props);
-            
-            // Parse message queue addresses
-            cfg.mqAddresses = parseMQAddresses(props);
+            rd = new BufferedReader(new FileReader(file));
+            String line;
+            while((line = rd.readLine()) != null)
+            {
+                line = line.trim();
+                if(line.startsWith("#") || line.isEmpty()) continue;
+                
+                String[] tokens = line.split("=");
+                if(tokens.length != 2) throw new Exception("Invalid property line: " + line);
+                String key = tokens[0].trim();
+                String value = tokens[1].trim();
+                
+                switch(key)
+                {
+                case PROP_WEB_PORT:
+                    cfg.webPort = parseWebPort(value);
+                    break;
+                case PROP_MQ_HOST:
+                    cfg.mqAddresses.add(parseMQAddresses(value));
+                    break;
+                case PROP_ES_URL:
+                    cfg.registryCfg.url = value;
+                    break;
+                case PROP_ES_INDEX:
+                    cfg.registryCfg.indexName = value;
+                    break;
+                case PROP_ES_AUTH:
+                    cfg.registryCfg.authFile = value;
+                    break;
+                default:
+                    throw new Exception("Invalid property '" + key + "'");
+                }
+            }
         }
         finally
         {
             CloseUtils.close(rd);
         }
-                
+        
         return cfg;
     }
 
     
-    private int parseWebPort(Properties props) throws Exception
+    private int parseWebPort(String port) throws Exception
     {
-        String tmp = props.getProperty(PROP_WEB_PORT);
-        if(tmp == null)
-        {
-            tmp = DEFAULT_WEB_PORT;
-            String msg = String.format("'%s' property is not set. Will use default value: %s", PROP_WEB_PORT, tmp);
-            log.warn(msg);
-        }
-
         try
         {
-            return Integer.parseInt(tmp);
+            return Integer.parseInt(port);
         }
         catch(Exception ex)
         {
-            String msg = String.format("Could not parse '%s' property %s", PROP_WEB_PORT, tmp);
+            String msg = String.format("Could not parse '%s' property: '%s'", PROP_WEB_PORT, port);
             throw new Exception(msg);
         }
     }
     
     
-    private List<IPAddress> parseMQAddresses(Properties props) throws Exception
+    private IPAddress parseMQAddresses(String str) throws Exception
     {
-        String tmp = props.getProperty(PROP_MQ_HOST);
-        if(tmp == null)
+        String[] tokens = str.split(":");
+        if(tokens.length != 2) 
         {
-            tmp = DEFAULT_MQ_HOST;
-            String msg = String.format("'%s' property is not set. Will use default value: %s", PROP_MQ_HOST, tmp);
-            log.warn(msg);
+            String msg = String.format("Invalid '%s' property: '%s'. Expected 'host:port' value.", PROP_MQ_HOST, str);
+            throw new Exception(msg);
         }
         
-        List<IPAddress> list = new ArrayList<>();
+        String host = tokens[0];
+        int port = 0;
         
-        StringTokenizer tkz = new StringTokenizer(tmp, ",;");
-        while(tkz.hasMoreTokens())
+        try
         {
-            String item = tkz.nextToken();
-            if(item == null) continue;
-            item = item.trim();
-            
-            String[] tokens = item.split(":");
-            if(tokens.length != 2) throw new Exception("Invalid host entry: '" + item + "'. Expected 'host:port' value.");
-            
-            String host = tokens[0];
-            int port = 0;
-            
-            try
-            {
-                port = Integer.parseInt(tokens[1]);
-            }
-            catch(Exception ex)
-            {
-                throw new Exception("Invalid host entry: '" + item + "'. Could not parse port.");
-            }
-            
-            list.add(new IPAddress(host, port));
+            port = Integer.parseInt(tokens[1]);
         }
-        
-        return list;
+        catch(Exception ex)
+        {
+            String msg = String.format("Invalid port in '%s' property: '%s'", PROP_MQ_HOST, str);
+            throw new Exception(msg);
+        }
+            
+        return new IPAddress(host, port);
     }
 }

@@ -20,4 +20,10 @@ public class IPAddress
     {
         return port;
     }
+    
+    @Override
+    public String toString()
+    {
+        return host + ":" + port;
+    }
 }
