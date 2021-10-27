@@ -10,4 +10,9 @@ public class Configuration
     public int webPort;
     
     public RegistryCfg registryCfg = new RegistryCfg();
+    
+    public boolean storeLabels = true;
+    public boolean storeJsonLabels = true;
+    public boolean processDataFiles = true;
+    
 }

@@ -6,6 +6,9 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.servlet.ServletHandler;
 
 import com.rabbitmq.client.Address;
 import com.rabbitmq.client.Channel;
@@ -14,12 +17,12 @@ import com.rabbitmq.client.ConnectionFactory;
 
 import gov.nasa.pds.harvest.cfg.Configuration;
 import gov.nasa.pds.harvest.cfg.ConfigurationReader;
-import gov.nasa.pds.harvest.http.StatusHandler;
-import gov.nasa.pds.harvest.mq.FilesConsumer;
+import gov.nasa.pds.harvest.cfg.IPAddress;
+import gov.nasa.pds.harvest.http.StatusServlet;
+import gov.nasa.pds.harvest.mq.FileMessageConsumer;
 import gov.nasa.pds.harvest.util.CloseUtils;
 import gov.nasa.pds.harvest.util.ExceptionUtils;
 import gov.nasa.pds.harvest.util.ThreadUtils;
-import io.undertow.Undertow;
 
 
 /**
@@ -73,30 +76,49 @@ public class HarvestServer
         Channel channel = rmqConnection.createChannel();
         channel.basicQos(1);
         
-        FilesConsumer consumer = new FilesConsumer(channel);
+        FileMessageConsumer consumer = new FileMessageConsumer(channel);
         channel.basicConsume(Constants.MQ_FILES, false, consumer);
 
         log.info("Started file consumer");
     }
     
     
-    private void startWebServer(int port)
+    /**
+     * Start embedded web server
+     * @param port a port to listen for incoming connections
+     */
+    private void startWebServer(int port) throws Exception
     {
-        Undertow.Builder bld = Undertow.builder();
-        bld.addHttpListener(port, "0.0.0.0");
-        bld.setHandler(new StatusHandler());
+        Server server = new Server();
+        
+        // HTTP connector
+        ServerConnector connector = new ServerConnector(server);
+        connector.setHost("0.0.0.0");
+        connector.setPort(port);
+        server.addConnector(connector);
 
-        Undertow server = bld.build();
+        // Servlet handler
+        ServletHandler handler = new ServletHandler();
+        handler.addServletWithMapping(StatusServlet.class, "/*");
+        server.setHandler(handler);
+        
+        // Start web server
         server.start();
         
         log.info("Started web server on port " + port);
     }
 
-
+    
+    /**
+     * Connect to RabbitMQ server. Wait until RabbitMQ is up. 
+     */
     private void connectToRabbitMQ()
     {
         List<Address> rmqAddr = new ArrayList<>();
-        rmqAddr.add(new Address("localhost", 5672));
+        for(IPAddress ipa: cfg.mqAddresses)
+        {
+            rmqAddr.add(new Address(ipa.getHost(), ipa.getPort()));
+        }
         
         while(true)
         {
