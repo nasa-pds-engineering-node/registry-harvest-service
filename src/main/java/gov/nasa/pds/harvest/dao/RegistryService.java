@@ -7,7 +7,7 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import gov.nasa.pds.harvest.mq.msg.FileMessage;
+import gov.nasa.pds.harvest.mq.msg.ProductMessage;
 import gov.nasa.pds.harvest.util.ThreadUtils;
 
 /**
@@ -37,7 +37,7 @@ public class RegistryService
      * corresponding file paths
      * @return a list of unregistered file paths. In case of an error rturn null.
      */
-    public List<String> getUnregisteredFiles(FileMessage msg)
+    public List<String> getUnregisteredFiles(ProductMessage msg)
     {
         List<String> fileList = new ArrayList<>();
 

@@ -10,17 +10,35 @@ import org.apache.logging.log4j.Logger;
 import gov.nasa.pds.harvest.util.CloseUtils;
 
 
+/**
+ * Reads Harvest server configuration file.
+ * @author karpenko
+ */
 public class ConfigurationReader
 {
-    private static final String PROP_MQ_HOST = "mq.host";
-    private static final String PROP_WEB_PORT = "web.port";
+    // Message server / queue type
+    private static final String PROP_MQ_TYPE = "mq.type";
     
+    // RabbitMQ
+    private static final String PROP_RMQ_HOST = "rmq.host";
+    private static final String PROP_RMQ_USER = "rmq.user";
+    private static final String PROP_RMQ_PASS = "rmq.password";
+    private static final IPAddress DEFAULT_RMQ_HOST = new IPAddress("localhost", 5672);
+
+    // ActiveMQ
+    private static final String PROP_AMQ_URL = "amq.url";
+    private static final String PROP_AMQ_USER = "amq.user";
+    private static final String PROP_AMQ_PASS = "amq.password";
+    private static final String DEFAULT_AMQ_URL = "tcp://localhost:61616";
+
+    // Embedded web server
+    private static final String PROP_WEB_PORT = "web.port";
+    private static final int DEFAULT_WEB_PORT = 8005;
+    
+    // Registry
     private static final String PROP_ES_URL = "es.url";
     private static final String PROP_ES_INDEX = "es.index";
     private static final String PROP_ES_AUTH = "es.authFile";
-        
-    private static final IPAddress DEFAULT_MQ_HOST = new IPAddress("localhost", 5672);
-    private static final int DEFAULT_WEB_PORT = 8002;
     
     private Logger log;
 
@@ -34,25 +52,93 @@ public class ConfigurationReader
     public Configuration read(File file) throws Exception
     {
         Configuration cfg = parseConfigFile(file);
+        validate(cfg);
+        
+        return cfg;
+    }
     
-        // Validate web port
+    
+    private void validate(Configuration cfg) throws Exception
+    {
+        // Validate Message queue / server
+        if(cfg.mqType == null)
+        {
+            String msg = String.format("Invalid configuration. Property '%s' is not set.", PROP_MQ_TYPE);
+            throw new Exception(msg);
+        }
+        
+        switch(cfg.mqType)
+        {
+        case ActiveMQ:
+            validateAMQ(cfg.amqCfg);
+            break;
+        case RabbitMQ:
+            validateRMQ(cfg.rmqCfg);
+            break;
+        }
+        
+        // Validate embedded web server
+        validateWeb(cfg);
+        
+        // Validate Registry / Elasticsearch
+        validateRegistry(cfg.registryCfg);
+    }
+    
+    
+    private void validateWeb(Configuration cfg)
+    {
         if(cfg.webPort == 0)
         {
             cfg.webPort = DEFAULT_WEB_PORT;
             String msg = String.format("'%s' property is not set. Will use default value: %d", PROP_WEB_PORT, cfg.webPort);
             log.warn(msg);
         }
-        
+    }
+    
+    
+    private void validateRMQ(RabbitMQCfg cfg) throws Exception
+    {
         // Validate MQ address
-        if(cfg.mqAddresses.isEmpty())
+        if(cfg.addresses.isEmpty())
         {
-            cfg.mqAddresses.add(DEFAULT_MQ_HOST);
+            cfg.addresses.add(DEFAULT_RMQ_HOST);
             String msg = String.format("'%s' property is not set. Will use default value: %s", 
-                    PROP_WEB_PORT, DEFAULT_MQ_HOST.toString());
+                    PROP_RMQ_HOST, DEFAULT_RMQ_HOST.toString());
+            log.warn(msg);
+        }
+    }
+
+    
+    private void validateAMQ(ActiveMQCfg cfg) throws Exception
+    {
+        if(cfg.url == null || cfg.url.isBlank())
+        {
+            cfg.url = DEFAULT_AMQ_URL;
+            String msg = String.format("'%s' property is not set. Will use default value: %s", 
+                    PROP_AMQ_URL, cfg.url);
+            log.warn(msg);
+        }
+    }
+
+    
+    private void validateRegistry(RegistryCfg cfg)
+    {
+        if(cfg.url == null)
+        {
+            cfg.url = "http://localhost:9200";
+            String msg = String.format("'%s' property is not set. Will use default value: %s", 
+                    PROP_ES_URL, cfg.url);
             log.warn(msg);
         }
         
-        return cfg;
+        if(cfg.indexName == null)
+        {
+            cfg.indexName = "registry";
+            String msg = String.format("'%s' property is not set. Will use default value: %s", 
+                    PROP_ES_INDEX, cfg.indexName);
+            log.warn(msg);
+        }
+        
     }
     
     
@@ -77,12 +163,39 @@ public class ConfigurationReader
                 
                 switch(key)
                 {
+                // Embedded web server
                 case PROP_WEB_PORT:
                     cfg.webPort = parseWebPort(value);
                     break;
-                case PROP_MQ_HOST:
-                    cfg.mqAddresses.add(parseMQAddresses(value));
+
+                // MQ type
+                case PROP_MQ_TYPE:
+                    cfg.mqType = parseMQType(value);
                     break;
+                    
+                // RabbitMQ
+                case PROP_RMQ_HOST:
+                    cfg.rmqCfg.addresses.add(parseMQAddresses(value));
+                    break;
+                case PROP_RMQ_USER:
+                    cfg.rmqCfg.userName = value;
+                    break;
+                case PROP_RMQ_PASS:
+                    cfg.rmqCfg.password = value;
+                    break;
+
+                // ActiveMQ
+                case PROP_AMQ_URL:
+                    cfg.amqCfg.url = value;
+                    break;
+                case PROP_AMQ_USER:
+                    cfg.amqCfg.userName = value;
+                    break;
+                case PROP_AMQ_PASS:
+                    cfg.amqCfg.password = value;
+                    break;
+                    
+                // Registry / Elasticsearch
                 case PROP_ES_URL:
                     cfg.registryCfg.url = value;
                     break;
@@ -92,6 +205,7 @@ public class ConfigurationReader
                 case PROP_ES_AUTH:
                     cfg.registryCfg.authFile = value;
                     break;
+                    
                 default:
                     throw new Exception("Invalid property '" + key + "'");
                 }
@@ -103,6 +217,17 @@ public class ConfigurationReader
         }
         
         return cfg;
+    }
+
+    
+    private MQType parseMQType(String str) throws Exception
+    {
+        if("ActiveMQ".equalsIgnoreCase(str)) return MQType.ActiveMQ;
+        if("RabbitMQ".equalsIgnoreCase(str)) return MQType.RabbitMQ;
+        
+        String msg = String.format("Invalid '%s' property value: '%s'. Expected 'ActiveMQ' or 'RabbitMQ'.", 
+                PROP_MQ_TYPE, str);
+        throw new Exception(msg);
     }
 
     
@@ -125,7 +250,7 @@ public class ConfigurationReader
         String[] tokens = str.split(":");
         if(tokens.length != 2) 
         {
-            String msg = String.format("Invalid '%s' property: '%s'. Expected 'host:port' value.", PROP_MQ_HOST, str);
+            String msg = String.format("Invalid '%s' property value: '%s'. Expected 'host:port'.", PROP_RMQ_HOST, str);
             throw new Exception(msg);
         }
         
@@ -138,7 +263,7 @@ public class ConfigurationReader
         }
         catch(Exception ex)
         {
-            String msg = String.format("Invalid port in '%s' property: '%s'", PROP_MQ_HOST, str);
+            String msg = String.format("Invalid port in '%s' property: '%s'", PROP_RMQ_HOST, str);
             throw new Exception(msg);
         }
             

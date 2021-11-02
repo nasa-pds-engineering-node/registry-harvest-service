@@ -8,7 +8,7 @@ package gov.nasa.pds.harvest;
 public interface Constants
 {
     // Message queue
-    public static final String MQ_FILES = "harvest.products";
+    public static final String MQ_PRODUCTS = "harvest.products";
 
     // Field names
     public static final String NS_SEPARATOR = ":";

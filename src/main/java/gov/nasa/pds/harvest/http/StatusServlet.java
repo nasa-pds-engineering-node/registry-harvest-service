@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import gov.nasa.pds.harvest.mq.MQClient;
 import gov.nasa.pds.harvest.util.ManifestUtils;
 
 
@@ -22,6 +23,8 @@ import gov.nasa.pds.harvest.util.ManifestUtils;
 @SuppressWarnings("serial")
 public class StatusServlet extends HttpServlet 
 {
+    private MQClient mqClient;
+    
     private Gson gson;
     
     private String version;
@@ -31,23 +34,27 @@ public class StatusServlet extends HttpServlet
      * Model class for the status message 
      */
     @SuppressWarnings("unused")
-    private static class Status
+    private static class Info
     {        
         public String application = "Harvest";
         public String version;
         public String buildTime;
         
-        public String maxMemory;
-        public String totalMemory;
-        public String freeMemory;
+        public String mqType;
+        public String mqConnection;
+        public String mqStatus;
+        
+        public String usedMemory;
     }
 
     
     /**
      * Constructor
+     * @param mqClient Messaging client
      */
-    public StatusServlet()
+    public StatusServlet(MQClient mqClient)
     {
+        this.mqClient = mqClient;
         gson = new GsonBuilder().setPrettyPrinting().create();
         setVersioninfo();
     }
@@ -70,14 +77,23 @@ public class StatusServlet extends HttpServlet
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
     {
-        Status status = new Status();
-        status.version = version;
-        status.buildTime = buildTime;
-        status.maxMemory = (Runtime.getRuntime().maxMemory() / 1000000) + " MB";
-        status.totalMemory = (Runtime.getRuntime().totalMemory() / 1000000) + " MB";
-        status.freeMemory = (Runtime.getRuntime().freeMemory() / 1000000) + " MB";
-
-        String jsonStr = gson.toJson(status);
+        Info info = new Info();
+        
+        // Version
+        info.version = version;
+        info.buildTime = buildTime;
+        
+        // MQ status
+        info.mqType = mqClient.getType();
+        info.mqConnection = mqClient.getConnectionInfo();
+        info.mqStatus = mqClient.isConnected() ? "UP" : "DOWN";
+        
+        // Memory
+        int totalMem = (int)(Runtime.getRuntime().totalMemory() / 1_000_000);
+        int freeMem = (int)(Runtime.getRuntime().freeMemory() / 1_000_000);
+        info.usedMemory = (totalMem - freeMem) + " MB";
+        
+        String jsonStr = gson.toJson(info);
 
         resp.setContentType("application/json");
         PrintWriter writer = resp.getWriter();

@@ -6,8 +6,9 @@ import java.util.List;
 import gov.nasa.pds.harvest.cfg.RegistryCfg;
 import gov.nasa.pds.harvest.dao.RegistryManager;
 import gov.nasa.pds.harvest.dao.RegistryService;
-import gov.nasa.pds.harvest.mq.msg.FileMessage;
+import gov.nasa.pds.harvest.mq.msg.ProductMessage;
 import gov.nasa.pds.harvest.util.Log4jConfigurator;
+
 
 public class TestFilesProcessor
 {
@@ -16,7 +17,7 @@ public class TestFilesProcessor
     {
         init();
         
-        FileMessage msg = createTestMessage();
+        ProductMessage msg = createTestMessage();
         
         try
         {
@@ -43,9 +44,9 @@ public class TestFilesProcessor
     }
     
     
-    private static FileMessage createTestMessage()
+    private static ProductMessage createTestMessage()
     {
-        FileMessage msg = new FileMessage();
+        ProductMessage msg = new ProductMessage();
         msg.jobId = "123";
         msg.lidvids = Arrays.asList("id1");
         msg.files = Arrays.asList("/tmp/d1/file1.xml");

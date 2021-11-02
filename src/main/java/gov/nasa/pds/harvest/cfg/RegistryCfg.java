@@ -2,8 +2,7 @@ package gov.nasa.pds.harvest.cfg;
 
 
 /**
- *Registry configuration model.
- * 
+ * Registry (elasticsearch) configuration model.
  * @author karpenko
  */
 public class RegistryCfg

@@ -1,4 +1,4 @@
-package gov.nasa.pds.harvest.mq;
+package gov.nasa.pds.harvest.mq.rmq;
 
 import java.io.IOException;
 import java.util.List;
@@ -12,33 +12,44 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 
+import gov.nasa.pds.harvest.Constants;
 import gov.nasa.pds.harvest.dao.RegistryService;
-import gov.nasa.pds.harvest.mq.msg.FileMessage;
+import gov.nasa.pds.harvest.mq.msg.ProductMessage;
 
 
 /**
  * A consumer of file messages from a RabbitMQ queue
  * @author karpenko
  */
-public class FileMessageConsumer extends DefaultConsumer
+public class ProductConsumerRabbitMQ extends DefaultConsumer
 {
     private Logger log;
     private Gson gson;
     
-    private RegistryService proc;
+    private RegistryService registry;
     
     
     /**
      * Constructor
      * @param channel RabbitMQ connection channel
      */
-    public FileMessageConsumer(Channel channel)
+    public ProductConsumerRabbitMQ(Channel channel)
     {
         super(channel);
         log = LogManager.getLogger(this.getClass());
         
         gson = new Gson();
-        proc = new RegistryService();
+        registry = new RegistryService();
+    }
+
+    
+    /**
+     * Start consuming messages
+     * @throws Exception
+     */
+    public void start() throws Exception
+    {
+        getChannel().basicConsume(Constants.MQ_PRODUCTS, false, this);
     }
 
     
@@ -47,9 +58,10 @@ public class FileMessageConsumer extends DefaultConsumer
             AMQP.BasicProperties properties, byte[] body) throws IOException
     {
         long deliveryTag = envelope.getDeliveryTag();
-        
+        log.info("Processing message " + properties.getMessageId());
+
         String jsonStr = new String(body);
-        FileMessage msg = gson.fromJson(jsonStr, FileMessage.class);
+        ProductMessage msg = gson.fromJson(jsonStr, ProductMessage.class);
         
         if(processMessage(msg))
         {
@@ -64,9 +76,8 @@ public class FileMessageConsumer extends DefaultConsumer
     }
     
     
-    private boolean processMessage(FileMessage msg) throws IOException
+    private boolean processMessage(ProductMessage msg) throws IOException
     {
-        log.info("Processing message " + msg.jobId);
         if(msg.files == null || msg.files.isEmpty()) return true;
         
         List<String> filesToProcess;
@@ -79,7 +90,7 @@ public class FileMessageConsumer extends DefaultConsumer
         // Only process unregistered products
         else
         {
-            filesToProcess = proc.getUnregisteredFiles(msg);
+            filesToProcess = registry.getUnregisteredFiles(msg);
             // There was an error. Reject the message.
             if(filesToProcess == null) return false;
             // All products from this message are already registered. Ack the message.

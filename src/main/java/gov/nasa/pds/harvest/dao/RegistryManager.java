@@ -1,5 +1,7 @@
 package gov.nasa.pds.harvest.dao;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.elasticsearch.client.RestClient;
 
 import gov.nasa.pds.harvest.cfg.RegistryCfg;
@@ -32,7 +34,14 @@ public class RegistryManager
         esClient = EsClientFactory.createRestClient(cfg.url, cfg.authFile);
         
         String indexName = cfg.indexName;
-        if(indexName == null || indexName.isEmpty()) indexName = "registry";
+        if(indexName == null || indexName.isEmpty()) 
+        {
+            indexName = "registry";
+        }
+
+        Logger log = LogManager.getLogger(this.getClass());
+        log.info("Registry URL: " + cfg.url);
+        log.info("Registry index: " + indexName);
         
         registryDAO = new RegistryDAO(esClient, indexName);
     }
@@ -45,9 +54,6 @@ public class RegistryManager
      */
     public static void init(RegistryCfg cfg) throws Exception
     {
-        // Registry is not configured. Run Harvest without Registry.
-        if(cfg == null) return;
-        
         instance = new RegistryManager(cfg);
     }
     

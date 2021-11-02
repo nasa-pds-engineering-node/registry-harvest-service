@@ -1,28 +1,23 @@
 package gov.nasa.pds.harvest;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.ServletHandler;
-
-import com.rabbitmq.client.Address;
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
+import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
 import gov.nasa.pds.harvest.cfg.Configuration;
 import gov.nasa.pds.harvest.cfg.ConfigurationReader;
-import gov.nasa.pds.harvest.cfg.IPAddress;
+import gov.nasa.pds.harvest.dao.RegistryManager;
+import gov.nasa.pds.harvest.http.MemoryServlet;
 import gov.nasa.pds.harvest.http.StatusServlet;
-import gov.nasa.pds.harvest.mq.FileMessageConsumer;
-import gov.nasa.pds.harvest.util.CloseUtils;
+import gov.nasa.pds.harvest.mq.MQClient;
+import gov.nasa.pds.harvest.mq.rmq.RabbitMQClient;
 import gov.nasa.pds.harvest.util.ExceptionUtils;
-import gov.nasa.pds.harvest.util.ThreadUtils;
 
 
 /**
@@ -34,10 +29,14 @@ public class HarvestServer
     private Logger log;
     private Configuration cfg;
     
-    private ConnectionFactory rmqConFactory;
-    private Connection rmqConnection;
-    
+    private MQClient mqClient;
 
+    
+    /**
+     * Constructor
+     * @param cfgFilePath configuration file path
+     * @throws Exception an exception
+     */
     public HarvestServer(String cfgFilePath) throws Exception
     {
         log = LogManager.getLogger(this.getClass());
@@ -48,40 +47,56 @@ public class HarvestServer
         ConfigurationReader cfgReader = new ConfigurationReader();
         cfg = cfgReader.read(file);
         
-        // Init RabbitMQ connection factory
-        rmqConFactory = new ConnectionFactory();
-        rmqConFactory.setAutomaticRecoveryEnabled(true);
+        mqClient = createMQClient(cfg);
     }
+
     
-    
-    public void run()
+    private MQClient createMQClient(Configuration cfg) throws Exception
     {
-        connectToRabbitMQ();
+        if(cfg == null || cfg.mqType == null)
+        {
+            throw new Exception("Invalid configuration. Message server type is not set.");
+        }
         
+        switch(cfg.mqType)
+        {
+        case ActiveMQ:
+            //return new ActiveMQClient(cfg.amqCfg);
+            throw new Exception("ActiveMQ client is not implemented yet.");
+        case RabbitMQ:
+            return new RabbitMQClient(cfg.rmqCfg);
+        }
+        
+        throw new Exception("Invalid message server type: " + cfg.mqType);
+    }
+
+    
+    /**
+     * Run the server
+     * @return 0 - server started without errors; 1 or greater - there was an error
+     */
+    public int run()
+    {
         try
         {
-            startFileConsumer();
+            // Init registry (elasticsearch) manager
+            RegistryManager.init(cfg.registryCfg);
+            
+            // Start embedded web server
             startWebServer(cfg.webPort);
+            
+            // Start message queue (ActiveMQ or RabbitMQ) client
+            mqClient.run();
         }
         catch(Exception ex)
         {
             log.error(ExceptionUtils.getMessage(ex));
-            CloseUtils.close(rmqConnection);
+            return 1;
         }
-    }
-
-    
-    private void startFileConsumer() throws Exception
-    {
-        Channel channel = rmqConnection.createChannel();
-        channel.basicQos(1);
         
-        FileMessageConsumer consumer = new FileMessageConsumer(channel);
-        channel.basicConsume(Constants.MQ_FILES, false, consumer);
-
-        log.info("Started file consumer");
+        return 0;
     }
-    
+
     
     /**
      * Start embedded web server
@@ -89,7 +104,9 @@ public class HarvestServer
      */
     private void startWebServer(int port) throws Exception
     {
-        Server server = new Server();
+        // Max threads = 10, min threads = 1
+        QueuedThreadPool threadPool = new QueuedThreadPool(10, 1);
+        Server server = new Server(threadPool);
         
         // HTTP connector
         ServerConnector connector = new ServerConnector(server);
@@ -99,7 +116,13 @@ public class HarvestServer
 
         // Servlet handler
         ServletHandler handler = new ServletHandler();
-        handler.addServletWithMapping(StatusServlet.class, "/*");
+        
+        // Status servlet
+        ServletHolder statusServlet = new ServletHolder(new StatusServlet(mqClient));
+        handler.addServletWithMapping(statusServlet, "/");
+
+        // Memory servlet
+        handler.addServletWithMapping(MemoryServlet.class, "/memory");
         server.setHandler(handler);
         
         // Start web server
@@ -108,33 +131,4 @@ public class HarvestServer
         log.info("Started web server on port " + port);
     }
 
-    
-    /**
-     * Connect to RabbitMQ server. Wait until RabbitMQ is up. 
-     */
-    private void connectToRabbitMQ()
-    {
-        List<Address> rmqAddr = new ArrayList<>();
-        for(IPAddress ipa: cfg.mqAddresses)
-        {
-            rmqAddr.add(new Address(ipa.getHost(), ipa.getPort()));
-        }
-        
-        while(true)
-        {
-            try
-            {
-                rmqConnection = rmqConFactory.newConnection(rmqAddr);
-                break;
-            }
-            catch(Exception ex)
-            {
-                log.warn("Could not connect to RabbitMQ. " + ex + ". Will retry in 10 sec.");
-                ThreadUtils.sleepSec(10);
-            }
-        }
-
-        log.info("Connected to RabbitMQ");
-    }
-        
 }

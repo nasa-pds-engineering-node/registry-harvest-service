@@ -38,10 +38,14 @@ public class HarvestServerMain
         
         // Create and start Harvest server
         HarvestServer server = createServer(args);
-        server.run();
+        int rc = server.run();
+        if(rc != 0)
+        {
+            System.exit(rc);
+        }
     }
 
-        
+
     private static HarvestServer createServer(String[] args)
     {
         try
