@@ -2,28 +2,30 @@ package gov.nasa.pds.harvest.proc;
 
 import java.io.File;
 import java.util.List;
-import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 
-import gov.nasa.pds.harvest.cfg.Configuration;
+import gov.nasa.pds.harvest.cfg.HarvestCfg;
 import gov.nasa.pds.harvest.job.Job;
 import gov.nasa.pds.harvest.meta.Metadata;
 import gov.nasa.pds.harvest.meta.ex.AutogenExtractor;
 import gov.nasa.pds.harvest.meta.ex.BasicMetadataExtractor;
 import gov.nasa.pds.harvest.meta.ex.BundleMetadataExtractor;
-import gov.nasa.pds.harvest.meta.ex.CollectionMetadataExtractor;
 import gov.nasa.pds.harvest.meta.ex.FileMetadataExtractor;
 import gov.nasa.pds.harvest.meta.ex.InternalReferenceExtractor;
 import gov.nasa.pds.harvest.meta.ex.SearchMetadataExtractor;
 import gov.nasa.pds.harvest.util.out.RegistryDocWriter;
-import gov.nasa.pds.harvest.util.out.WriterManager;
 import gov.nasa.pds.harvest.util.xml.XmlDomUtils;
 
 
+/**
+ * Process products (PDS4 XML label files)
+ * @author karpenko
+ */
 public class ProductProcessor
 {
     private Logger log;
@@ -31,13 +33,10 @@ public class ProductProcessor
     // Skip files bigger than 10MB
     private static final long MAX_XML_FILE_LENGTH = 10_000_000;
 
-    private Configuration config;
     private DocumentBuilderFactory dbf;
 
     // Bundle and Collection extractors & processors
     private BundleMetadataExtractor bundleExtractor;
-    private CollectionMetadataExtractor collectionExtractor;
-    private CollectionInventoryProcessor invProc;
     
     // Common extractors
     private BasicMetadataExtractor basicExtractor;
@@ -45,11 +44,34 @@ public class ProductProcessor
     private AutogenExtractor autogenExtractor;
     private SearchMetadataExtractor searchExtractor;
     private FileMetadataExtractor fileDataExtractor;
+
+    private RegistryDocWriter writer;
     
     
-    public ProductProcessor()
+    /**
+     * Constructor
+     * @throws Exception
+     */
+    public ProductProcessor(HarvestCfg cfg, RegistryDocWriter writer) throws Exception
     {
+        if(cfg == null) throw new IllegalArgumentException("Configuration is null");
+        if(writer == null) throw new IllegalArgumentException("Writer is null");
+        this.writer = writer;
+        
+        log = LogManager.getLogger(getClass());
+
+        dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(false);
+        
+        basicExtractor = new BasicMetadataExtractor();
+        refExtractor = new InternalReferenceExtractor();
+        autogenExtractor = new AutogenExtractor();
+        searchExtractor = new SearchMetadataExtractor();
+        fileDataExtractor = new FileMetadataExtractor(cfg);
+        
+        bundleExtractor = new BundleMetadataExtractor();
     }
+
     
     /**
      * Process one file
@@ -57,7 +79,7 @@ public class ProductProcessor
      * @param job Harvest job configuration parameters
      * @throws Exception Generic exception
      */
-    private void processFile(File file, Job job) throws Exception
+    public void processFile(File file, Job job) throws Exception
     {
         // Skip very large files
         if(file.length() > MAX_XML_FILE_LENGTH)
@@ -87,21 +109,10 @@ public class ProductProcessor
 
         String rootElement = doc.getDocumentElement().getNodeName();
 
-        // Process Collection specific data
-        if("Product_Collection".equals(rootElement))
-        {
-            processInventoryFiles(file, doc, meta, job.jobId);
-        }
         // Process Bundle specific data
-        else if("Product_Bundle".equals(rootElement))
+        if("Product_Bundle".equals(rootElement))
         {
             addCollectionRefs(meta, doc);
-        }
-        // Process supplemental products
-        else if("Product_Metadata_Supplemental".equals(rootElement))
-        {
-            //SupplementalWriter swriter = WriterManager.getInstance().getSupplementalWriter();
-            //swriter.write(file);
         }
         
         // Internal references
@@ -115,30 +126,9 @@ public class ProductProcessor
 
         // Extract file data
         fileDataExtractor.extract(file, meta, job);
-        
-        RegistryDocWriter writer = WriterManager.getInstance().getRegistryWriter();
-        writer.write(meta, job.jobId);
-    }
 
-    
-    /**
-     * Process collection inventory files
-     * @param collectionFile PDS4 collection label file
-     * @param doc Parsed PDS4 collection label file.
-     * @param meta Collection metadata extracted from PDS4 collection label file
-     * @param jobId Harvest job id
-     * @throws Exception Generic exception
-     */
-    private void processInventoryFiles(File collectionFile, Document doc, Metadata meta, String jobId) throws Exception
-    {
-        Set<String> fileNames = collectionExtractor.extractInventoryFileNames(doc);
-        if(fileNames == null) return;
-        
-        for(String fileName: fileNames)
-        {
-            File invFile = new File(collectionFile.getParentFile(), fileName);
-            invProc.writeCollectionInventory(meta, invFile, jobId);
-        }
+        // Write metadata
+        writer.write(meta, job.jobId);
     }
 
     

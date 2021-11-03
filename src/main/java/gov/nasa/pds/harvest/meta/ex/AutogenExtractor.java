@@ -120,7 +120,8 @@ public class AutogenExtractor
         
         // Convert dates to "ISO instant" format
         String nodeName = node.getLocalName();
-        if(nodeName.contains("date") || job.dateFields.contains(fieldName))
+        if(nodeName.contains("date") || 
+                (job.dateFields != null && job.dateFields.contains(fieldName)))
         {
             fieldValue = dateConverter.toIsoInstantString(nodeName, fieldValue);
         }

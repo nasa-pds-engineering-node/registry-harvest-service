@@ -32,19 +32,9 @@ public class Configuration
      */
     public RegistryCfg registryCfg = new RegistryCfg();
     
+
     /**
-     * Store original XML PDS labels as BLOBs
+     * Harvest configuration
      */
-    public boolean storeLabels = true;
-    
-    /**
-     * Store JSON formatted PDS labels as BLOBs
-     */
-    public boolean storeJsonLabels = true;
-    
-    /**
-     * Process data files (referenced in PDS label's File section)
-     */
-    public boolean processDataFiles = true;
-    
+    public HarvestCfg harvestCfg = new HarvestCfg();
 }

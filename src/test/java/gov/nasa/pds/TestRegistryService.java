@@ -10,7 +10,7 @@ import gov.nasa.pds.harvest.mq.msg.ProductMessage;
 import gov.nasa.pds.harvest.util.Log4jConfigurator;
 
 
-public class TestFilesProcessor
+public class TestRegistryService
 {
 
     public static void main(String[] args) throws Exception
@@ -21,8 +21,8 @@ public class TestFilesProcessor
         
         try
         {
-            RegistryService proc = new RegistryService();
-            List<String> files = proc.getUnregisteredFiles(msg);
+            RegistryService srv = new RegistryService();
+            List<String> files = srv.getUnregisteredFiles(msg);
             System.out.println(files);
         }
         finally

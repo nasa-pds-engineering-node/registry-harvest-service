@@ -1,7 +1,13 @@
 package gov.nasa.pds.harvest.util.out;
 
-import java.io.Closeable;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
+import com.google.gson.stream.JsonWriter;
+
+import gov.nasa.pds.harvest.meta.FieldMap;
 import gov.nasa.pds.harvest.meta.Metadata;
 
 
@@ -10,13 +16,93 @@ import gov.nasa.pds.harvest.meta.Metadata;
  *  
  * @author karpenko
  */
-public interface RegistryDocWriter extends Closeable
+public class RegistryDocWriter
 {
+    private List<String> data;
+    
+    /**
+     * Constructor
+     */
+    public RegistryDocWriter()
+    {
+        data = new ArrayList<>();
+    }
+
+    
+    public List<String> getData()
+    {
+        return data;
+    }
+    
+    
+    public void clearData()
+    {
+        data.clear();
+    }
+    
+    
     /**
      * Write metadata extracted from PDS4 labels.
      * @param meta metadata extracted from PDS4 label.
      * @param jobId Harvest job id
      * @throws Exception Generic exception
      */
-    public void write(Metadata meta, String jobId) throws Exception;
+    public void write(Metadata meta, String jobId) throws Exception
+    {
+        // First line: primary key 
+        String lidvid = meta.lid + "::" + meta.vid;
+        String pkJson = NDJsonDocUtils.createPKJson(lidvid);
+        data.add(pkJson);
+        
+        // Second line: main document
+
+        StringWriter sw = new StringWriter();
+        JsonWriter jw = new JsonWriter(sw);
+        
+        jw.beginObject();
+
+        // Basic info
+        NDJsonDocUtils.writeField(jw, "lid", meta.lid);
+        NDJsonDocUtils.writeField(jw, "vid", meta.strVid);
+        NDJsonDocUtils.writeField(jw, "lidvid", lidvid);
+        NDJsonDocUtils.writeField(jw, "title", meta.title);
+        NDJsonDocUtils.writeField(jw, "product_class", meta.prodClass);
+
+        // Transaction ID
+        NDJsonDocUtils.writeField(jw, "_package_id", jobId);
+        
+        // References
+        write(jw, meta.intRefs);
+        
+        // Other Fields
+        write(jw, meta.fields);
+        
+        jw.endObject();
+        
+        jw.close();
+
+        String dataJson = sw.getBuffer().toString();
+        data.add(dataJson);
+    }
+
+
+    private void write(JsonWriter jw, FieldMap fmap) throws Exception
+    {
+        if(fmap == null || fmap.isEmpty()) return;
+        
+        for(String key: fmap.getNames())
+        {
+            Collection<String> values = fmap.getValues(key);
+            
+            // Skip empty single value fields
+            if(values.size() == 1 && values.iterator().next().isEmpty())
+            {
+                continue;
+            }
+
+            //allFields.add(key);
+            NDJsonDocUtils.writeField(jw, key, values);
+        }
+    }
+
 }

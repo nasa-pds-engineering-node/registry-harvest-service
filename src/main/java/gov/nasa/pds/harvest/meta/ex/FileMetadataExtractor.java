@@ -23,7 +23,7 @@ import org.json.JSONObject;
 import org.json.XML;
 
 import gov.nasa.pds.harvest.Constants;
-import gov.nasa.pds.harvest.cfg.Configuration;
+import gov.nasa.pds.harvest.cfg.HarvestCfg;
 import gov.nasa.pds.harvest.job.FileRefCfg;
 import gov.nasa.pds.harvest.job.Job;
 import gov.nasa.pds.harvest.meta.Metadata;
@@ -38,9 +38,7 @@ public class FileMetadataExtractor
 {
     private Logger log;
     
-    private boolean storeLabels;
-    private boolean storeJsonLabels;
-    private boolean processDataFiles;
+    private HarvestCfg cfg;
     
     private MessageDigest md5Digest;
     private byte[] buf;
@@ -52,8 +50,11 @@ public class FileMetadataExtractor
      * @param config configuration
      * @throws Exception and exception
      */
-    public FileMetadataExtractor(Configuration cfg) throws Exception
+    public FileMetadataExtractor(HarvestCfg cfg) throws Exception
     {
+        if(cfg == null) throw new IllegalArgumentException("Configuration is null");
+        this.cfg = cfg;
+        
         log = LogManager.getLogger(this.getClass());
         
         if(cfg.storeLabels == false)
@@ -95,19 +96,19 @@ public class FileMetadataExtractor
         meta.fields.addValue(createLabelFileFieldName("file_ref"), getFileRef(file, job.fileRefRules));
         
         // XML BLOB (optional)
-        if(storeLabels)
+        if(cfg.storeLabels)
         {
             meta.fields.addValue(createLabelFileFieldName("blob"), getBlob(file));
         }
         
         // JSON BLOB (required)
-        if(storeJsonLabels)
+        if(cfg.storeJsonLabels)
         {
             meta.fields.addValue(createLabelFileFieldName("json_blob"), getJsonBlob(file));
         }
         
         // Process data files
-        if(processDataFiles)
+        if(cfg.processDataFiles)
         {
             processDataFiles(file.getParentFile(), meta, job);
         }

@@ -14,7 +14,6 @@ import gov.nasa.pds.harvest.util.out.InventoryBatchReader;
 import gov.nasa.pds.harvest.util.out.ProdRefsBatch;
 import gov.nasa.pds.harvest.util.out.RefType;
 import gov.nasa.pds.harvest.util.out.RefsDocWriter;
-import gov.nasa.pds.harvest.util.out.WriterManager;
 
 
 /**
@@ -85,7 +84,8 @@ public class CollectionInventoryProcessor
             if(count == 0) break;
             
             // Write batch
-            RefsDocWriter writer = WriterManager.getInstance().getRefsWriter();
+//##################################################            
+            RefsDocWriter writer = null;
             writer.writeBatch(meta, batch, RefType.PRIMARY, jobId);
             
             if(count < WRITE_BATCH_SIZE) break;
@@ -114,7 +114,8 @@ public class CollectionInventoryProcessor
             if(count == 0) break;
             
             // Write batch
-            RefsDocWriter writer = WriterManager.getInstance().getRefsWriter();
+//###################################################            
+            RefsDocWriter writer = null;
             writer.writeBatch(meta, batch, RefType.SECONDARY, jobId);
             
             if(count < WRITE_BATCH_SIZE) break;

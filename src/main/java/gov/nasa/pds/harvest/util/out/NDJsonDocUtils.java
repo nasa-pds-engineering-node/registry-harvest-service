@@ -18,12 +18,12 @@ public class NDJsonDocUtils
 
 
     /**
-     * Write primary key (first line in NJSON record)
-     * @param writer Generic writer
+     * Create primary key JSON (first line in NJSON record)
      * @param id primary key
+     * @return primary key JSON
      * @throws Exception Generic exception
      */
-    public static void writePK(Writer writer, String id) throws Exception
+    public static String createPKJson(String id) throws Exception
     {
         StringWriter sw = new StringWriter();
         JsonWriter jw = new JsonWriter(sw);
@@ -39,7 +39,19 @@ public class NDJsonDocUtils
         
         jw.close();
         
-        writer.write(sw.getBuffer().toString());
+        return sw.getBuffer().toString();
+    }
+
+    
+    /**
+     * Write primary key (first line in NJSON record)
+     * @param writer Generic writer
+     * @param id primary key
+     * @throws Exception Generic exception
+     */
+    public static void writePK(Writer writer, String id) throws Exception
+    {
+        writer.write(createPKJson(id));
     }
 
     
