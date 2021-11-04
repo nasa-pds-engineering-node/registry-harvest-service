@@ -29,7 +29,7 @@ public class ProductMessage
     /**
      * List of rules to generate file references.
      */
-    public List<String> fileRefs;
+    public List<String> fileRefRules;
 
     /**
      * Overwrite existing products in the Registry (Elasticsearch) if set to true.

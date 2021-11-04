@@ -26,21 +26,23 @@ public class RabbitMQClient implements MQClient
 {
     private Logger log;
     private RabbitMQCfg cfg;
+    private ConsumerFactory consumerFactory;
     
-    private ConnectionFactory factory;
-    private Connection connection;
-    
-    private String connectionInfo;
+    private ConnectionFactory rmqConnectionFactory;
+    private Connection rmqConnection;
+    private String rmqConnectionInfo;
     
 
     /**
      * Constructor
      * @param cfg RabbitMQ configuration
      */
-    public RabbitMQClient(RabbitMQCfg cfg)
+    public RabbitMQClient(RabbitMQCfg cfg, ConsumerFactory consumerFactory)
     {
         // Get logger
         log = LogManager.getLogger(this.getClass());
+        
+        this.consumerFactory = consumerFactory;
         
         // Validate and store configuration
         if(cfg == null || cfg.addresses == null || cfg.addresses.isEmpty()) 
@@ -51,13 +53,13 @@ public class RabbitMQClient implements MQClient
         this.cfg = cfg;
 
         // Create connection factory
-        factory = new ConnectionFactory();
-        factory.setAutomaticRecoveryEnabled(true);
+        rmqConnectionFactory = new ConnectionFactory();
+        rmqConnectionFactory.setAutomaticRecoveryEnabled(true);
         
         if(cfg.userName != null)
         {
-            factory.setUsername(cfg.userName);
-            factory.setPassword(cfg.password);
+            rmqConnectionFactory.setUsername(cfg.userName);
+            rmqConnectionFactory.setPassword(cfg.password);
         }
         
         // Build connection info string
@@ -69,7 +71,7 @@ public class RabbitMQClient implements MQClient
             bld.append(ipa.getHost() + ":" + ipa.getPort());
         }
         
-        this.connectionInfo = bld.toString();        
+        this.rmqConnectionInfo = bld.toString();        
     }
 
     
@@ -83,20 +85,20 @@ public class RabbitMQClient implements MQClient
     @Override
     public String getConnectionInfo()
     {
-        return connectionInfo;
+        return rmqConnectionInfo;
     }
 
     
     @Override
     public boolean isConnected()
     {
-        if(connection == null) 
+        if(rmqConnection == null) 
         {
             return false;
         }
         else
         {
-            return connection.isOpen();
+            return rmqConnection.isOpen();
         }
     }
 
@@ -119,9 +121,9 @@ public class RabbitMQClient implements MQClient
      */
     public void connect()
     {
-        if(connection != null) return;
+        if(rmqConnection != null) return;
         
-        log.info("Connecting to RabbitMQ at " + connectionInfo);
+        log.info("Connecting to RabbitMQ at " + rmqConnectionInfo);
         
         // Convert configuration model classes to RabbitMQ model classes
         List<Address> rmqAddr = new ArrayList<>();
@@ -135,7 +137,7 @@ public class RabbitMQClient implements MQClient
         {
             try
             {
-                connection = factory.newConnection(rmqAddr);
+                rmqConnection = rmqConnectionFactory.newConnection(rmqAddr);
                 break;
             }
             catch(Exception ex)
@@ -152,16 +154,17 @@ public class RabbitMQClient implements MQClient
     
     public void close()
     {
-        CloseUtils.close(connection);    
+        CloseUtils.close(rmqConnection);    
     }
     
     
     private ProductConsumerRabbitMQ createProductConsumer() throws Exception
     {
-        Channel channel = connection.createChannel();
+        Channel channel = rmqConnection.createChannel();
         channel.basicQos(1);
         
-        ProductConsumerRabbitMQ consumer = new ProductConsumerRabbitMQ(channel);
+        ProductConsumer genericProductConsumer = consumerFactory.createProductConsumer();
+        ProductConsumerRabbitMQ consumer = new ProductConsumerRabbitMQ(channel, genericProductConsumer);
         return consumer;
     }
     

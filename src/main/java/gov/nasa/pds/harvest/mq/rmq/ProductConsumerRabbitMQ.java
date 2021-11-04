@@ -30,12 +30,13 @@ public class ProductConsumerRabbitMQ extends DefaultConsumer
      * Constructor
      * @param channel RabbitMQ connection channel
      */
-    public ProductConsumerRabbitMQ(Channel channel)
+    public ProductConsumerRabbitMQ(Channel channel, ProductConsumer prodConsumer)
     {
         super(channel);
-        log = LogManager.getLogger(this.getClass());
+        this.prodConsumer = prodConsumer;
+        
+        log = LogManager.getLogger(this.getClass());        
         gson = new Gson();
-        prodConsumer = new ProductConsumer();
     }
 
     

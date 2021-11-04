@@ -1,25 +1,38 @@
 package gov.nasa.pds.harvest.mq.rmq;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import gov.nasa.pds.harvest.cfg.HarvestCfg;
 import gov.nasa.pds.harvest.dao.RegistryService;
+import gov.nasa.pds.harvest.job.Job;
+import gov.nasa.pds.harvest.job.JobFactory;
 import gov.nasa.pds.harvest.mq.msg.ProductMessage;
+import gov.nasa.pds.harvest.proc.ProductProcessor;
+import gov.nasa.pds.harvest.util.ExceptionUtils;
+import gov.nasa.pds.harvest.util.out.RegistryDocWriter;
 
 
 public class ProductConsumer
 {
     private Logger log;
-    private RegistryService registry;
-
+    private RegistryService registry;    
+    private RegistryDocWriter writer;
+    private ProductProcessor proc;
     
-    public ProductConsumer()
+    
+    public ProductConsumer(HarvestCfg cfg) throws Exception
     {
         log = LogManager.getLogger(this.getClass());
+        
         registry = new RegistryService();
+        
+        writer = new RegistryDocWriter();
+        proc = new ProductProcessor(cfg, writer);
     }
     
     
@@ -47,9 +60,41 @@ public class ProductConsumer
         }
 
         // Harvest files
-        System.out.println(filesToProcess);
+        Job job = JobFactory.createJob(msg);
+        boolean status = harvestFiles(filesToProcess, job);
         
+        return status;
+    }
+
+    
+    private boolean harvestFiles(List<String> filesToProcess, Job job)
+    {
+        writer.clearData();
+        
+        for(String strFile: filesToProcess)
+        {
+            File file = new File(strFile);
+            
+            try
+            {
+                proc.processFile(file, job);
+            }
+            catch(Exception ex)
+            {
+                log.error("Could not process file " + file.getAbsolutePath() + ": " + ExceptionUtils.getMessage(ex));
+            }
+        }
+        
+        List<String> data = writer.getData();
+
+        System.out.println("************** DATA ***************");
+        for(String str: data)
+        {
+            System.out.println(str);
+        }
+
         return true;
     }
+    
 
 }

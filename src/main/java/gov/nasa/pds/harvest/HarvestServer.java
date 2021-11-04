@@ -16,6 +16,7 @@ import gov.nasa.pds.harvest.dao.RegistryManager;
 import gov.nasa.pds.harvest.http.MemoryServlet;
 import gov.nasa.pds.harvest.http.StatusServlet;
 import gov.nasa.pds.harvest.mq.MQClient;
+import gov.nasa.pds.harvest.mq.rmq.ConsumerFactory;
 import gov.nasa.pds.harvest.mq.rmq.RabbitMQClient;
 import gov.nasa.pds.harvest.util.ExceptionUtils;
 
@@ -58,13 +59,15 @@ public class HarvestServer
             throw new Exception("Invalid configuration. Message server type is not set.");
         }
         
+        ConsumerFactory consumerFactory = new ConsumerFactory(cfg.harvestCfg);
+        
         switch(cfg.mqType)
         {
         case ActiveMQ:
             //return new ActiveMQClient(cfg.amqCfg);
             throw new Exception("ActiveMQ client is not implemented yet.");
         case RabbitMQ:
-            return new RabbitMQClient(cfg.rmqCfg);
+            return new RabbitMQClient(cfg.rmqCfg, consumerFactory);
         }
         
         throw new Exception("Invalid message server type: " + cfg.mqType);
