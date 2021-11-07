@@ -59,7 +59,7 @@ public class HarvestServer
             throw new Exception("Invalid configuration. Message server type is not set.");
         }
         
-        ConsumerFactory consumerFactory = new ConsumerFactory(cfg.harvestCfg);
+        ConsumerFactory consumerFactory = new ConsumerFactory(cfg.harvestCfg, cfg.registryCfg);
         
         switch(cfg.mqType)
         {

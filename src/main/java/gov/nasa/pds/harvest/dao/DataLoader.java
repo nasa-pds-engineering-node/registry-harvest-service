@@ -15,6 +15,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.google.gson.Gson;
 
+import gov.nasa.pds.harvest.cfg.RegistryCfg;
 import gov.nasa.pds.harvest.util.CloseUtils;
 import gov.nasa.pds.registry.common.es.client.EsUtils;
 import gov.nasa.pds.registry.common.es.client.HttpConnectionFactory;
@@ -36,21 +37,22 @@ public class DataLoader
 
     /**
      * Constructor
-     * @param esUrl Elasticsearch URL, e.g., "http://localhost:9200"
-     * @param indexName Elasticsearch index name
-     * @param authConfigFile Elasticsearch authentication configuration file 
-     * (see Registry Manager documentation for more info)
+     * @param cfg registry configuration
      * @throws Exception an exception
      */
-    public DataLoader(String esUrl, String indexName, String authConfigFile) throws Exception
+    public DataLoader(RegistryCfg cfg) throws Exception
     {
         log = LogManager.getLogger(this.getClass());
-        conFactory = new HttpConnectionFactory(esUrl, indexName, "_bulk");
-        conFactory.initAuth(authConfigFile);
+        conFactory = new HttpConnectionFactory(cfg.url, cfg.indexName, "_bulk");
+        conFactory.initAuth(cfg.authFile);
     }
     
     
-    
+    /**
+     * Load data into Elasticsearch
+     * @param data NJSON data. (2 lines per record)
+     * @throws Exception an exception
+     */
     public void loadBatch(List<String> data) throws Exception
     {
         if(data == null || data.isEmpty()) return;

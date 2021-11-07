@@ -2,18 +2,18 @@ package gov.nasa.pds.harvest.proc;
 
 import java.io.File;
 import java.io.FileReader;
-import java.util.Collection;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import gov.nasa.pds.harvest.dao.RegistryDAO;
-import gov.nasa.pds.harvest.dao.RegistryManager;
-import gov.nasa.pds.harvest.meta.Metadata;
+import gov.nasa.pds.harvest.cfg.RegistryCfg;
+import gov.nasa.pds.harvest.dao.DataLoader;
 import gov.nasa.pds.harvest.util.out.InventoryBatchReader;
 import gov.nasa.pds.harvest.util.out.ProdRefsBatch;
 import gov.nasa.pds.harvest.util.out.RefType;
-import gov.nasa.pds.harvest.util.out.RefsDocWriter;
+import gov.nasa.pds.registry.common.util.CloseUtils;
+import gov.nasa.pds.harvest.util.out.InventoryDocWriter;
 
 
 /**
@@ -32,18 +32,22 @@ public class CollectionInventoryProcessor
 {
     protected Logger log;
     
-    private int WRITE_BATCH_SIZE = 500;
-    private int ELASTIC_BATCH_SIZE = 50;
+    private int REF_BATCH_SIZE = 500;
+    private int ES_DOC_BATCH_SIZE = 10;
     
     private ProdRefsBatch batch = new ProdRefsBatch();
+    private InventoryDocWriter writer = new InventoryDocWriter();
+    
+    private DataLoader loader;
     
     
     /**
      * Constructor
      */
-    public CollectionInventoryProcessor()
+    public CollectionInventoryProcessor(RegistryCfg cfg) throws Exception
     {
         log = LogManager.getLogger(this.getClass());
+        loader = new DataLoader(cfg);
     }
     
     
@@ -53,75 +57,60 @@ public class CollectionInventoryProcessor
      * into a JSON or XML file. JSON files can be imported into Elasticsearch by 
      * Registry Manager tool.
      * 
-     * @param meta Collection metadata
+     * @param collectionLidVid Collection LIDVID
      * @param inventoryFile Collection inventory file, e.g., "document_collection_inventory.csv"
      * @param jobId Harvest job id
      * @throws Exception Generic exception
      */
-    public void writeCollectionInventory(Metadata meta, File inventoryFile, String jobId) throws Exception
+    public void writeCollectionInventory(String collectionLidVid, File inventoryFile, String jobId) throws Exception
     {
-        writePrimaryRefs(meta, inventoryFile, jobId);
-        writeSecondaryRefs(meta, inventoryFile, jobId);
+        writeRefs(collectionLidVid, inventoryFile, jobId, RefType.PRIMARY);
+        writeRefs(collectionLidVid, inventoryFile, jobId, RefType.PRIMARY);
     }
     
     
     /**
      * Write primary product references
-     * @param meta Collection metadata
+     * @param collectionLidVid Collection LIDVID
      * @param inventoryFile Collection inventory file, e.g., "document_collection_inventory.csv"
      * @param jobId Harvest job id
      * @throws Exception Generic exception
      */
-    private void writePrimaryRefs(Metadata meta, File inventoryFile, String jobId) throws Exception
+    private void writeRefs(String collectionLidVid, File inventoryFile, String jobId, RefType refType) throws Exception
     {
         batch.batchNum = 0;
+        writer.clearData();
         
-        InventoryBatchReader rd = new InventoryBatchReader(new FileReader(inventoryFile), RefType.PRIMARY);
+        InventoryBatchReader rd = null;
         
-        while(true)
+        try
         {
-            int count = rd.readNextBatch(WRITE_BATCH_SIZE, batch);
-            if(count == 0) break;
+            rd = new InventoryBatchReader(new FileReader(inventoryFile), refType);
             
-            // Write batch
-//##################################################            
-            RefsDocWriter writer = null;
-            writer.writeBatch(meta, batch, RefType.PRIMARY, jobId);
-            
-            if(count < WRITE_BATCH_SIZE) break;
+            while(true)
+            {
+                int count = rd.readNextBatch(REF_BATCH_SIZE, batch);
+                if(count == 0) break;
+                
+                writer.writeBatch(collectionLidVid, batch, refType, jobId);
+                if(batch.batchNum % ES_DOC_BATCH_SIZE == 0)
+                {
+                    List<String> data = writer.getData();
+                    loader.loadBatch(data);
+                    writer.clearData();
+                }
+                
+                if(count < REF_BATCH_SIZE) break;
+            }
+    
+            // Load last page if size > 0
+            List<String> data = writer.getData();
+            loader.loadBatch(data);
         }
-        
-        rd.close();
+        finally
+        {
+            CloseUtils.close(rd);
+        }
     }
 
-    
-    /**
-     * Write secondary product references
-     * @param meta Collection metadata 
-     * @param inventoryFile Collection inventory file, e.g., "document_collection_inventory.csv"
-     * @param jobId Harvest job id
-     * @throws Exception Generic exception
-     */
-    private void writeSecondaryRefs(Metadata meta, File inventoryFile, String jobId) throws Exception
-    {
-        batch.batchNum = 0;
-        
-        InventoryBatchReader rd = new InventoryBatchReader(new FileReader(inventoryFile), RefType.SECONDARY);
-        
-        while(true)
-        {
-            int count = rd.readNextBatch(WRITE_BATCH_SIZE, batch);
-            if(count == 0) break;
-            
-            // Write batch
-//###################################################            
-            RefsDocWriter writer = null;
-            writer.writeBatch(meta, batch, RefType.SECONDARY, jobId);
-            
-            if(count < WRITE_BATCH_SIZE) break;
-        }
-        
-        rd.close();
-    }
-    
 }

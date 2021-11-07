@@ -1,13 +1,14 @@
 package gov.nasa.pds.harvest.mq.rmq;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import gov.nasa.pds.harvest.cfg.HarvestCfg;
+import gov.nasa.pds.harvest.cfg.RegistryCfg;
+import gov.nasa.pds.harvest.dao.DataLoader;
 import gov.nasa.pds.harvest.dao.RegistryService;
 import gov.nasa.pds.harvest.job.Job;
 import gov.nasa.pds.harvest.job.JobFactory;
@@ -20,23 +21,27 @@ import gov.nasa.pds.harvest.util.out.RegistryDocWriter;
 public class ProductConsumer
 {
     private Logger log;
-    private RegistryService registry;    
-    private RegistryDocWriter writer;
+    private RegistryService registry;
+    
+    private RegistryDocWriter registryDocWriter;
     private ProductProcessor proc;
+    private DataLoader dataLoader;
     
     
-    public ProductConsumer(HarvestCfg cfg) throws Exception
+    public ProductConsumer(HarvestCfg harvestCfg, RegistryCfg registryCfg) throws Exception
     {
         log = LogManager.getLogger(this.getClass());
         
         registry = new RegistryService();
         
-        writer = new RegistryDocWriter();
-        proc = new ProductProcessor(cfg, writer);
+        registryDocWriter = new RegistryDocWriter();
+        proc = new ProductProcessor(harvestCfg, registryDocWriter);
+        
+        dataLoader = new DataLoader(registryCfg);
     }
     
     
-    public boolean processMessage(ProductMessage msg) throws IOException
+    public boolean processMessage(ProductMessage msg)
     {
         if(msg.files == null || msg.files.isEmpty()) return true;
 
@@ -69,8 +74,10 @@ public class ProductConsumer
     
     private boolean harvestFiles(List<String> filesToProcess, Job job)
     {
-        writer.clearData();
+        // Clear cached batch of Elasticsearch JSON documents
+        registryDocWriter.clearData();
         
+        // Add Elasticsearch JSON documents to the batch
         for(String strFile: filesToProcess)
         {
             File file = new File(strFile);
@@ -85,14 +92,20 @@ public class ProductConsumer
             }
         }
         
-        List<String> data = writer.getData();
+        // Get cached JSON data
+        List<String> data = registryDocWriter.getData();
 
-        System.out.println("************** DATA ***************");
-        for(String str: data)
+        // Load the data into Elasticsearch
+        try
         {
-            System.out.println(str);
+            dataLoader.loadBatch(data);
         }
-
+        catch(Exception ex)
+        {
+            log.error(ExceptionUtils.getMessage(ex));
+            return false;
+        }
+        
         return true;
     }
     

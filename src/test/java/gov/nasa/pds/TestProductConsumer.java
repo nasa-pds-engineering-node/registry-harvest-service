@@ -3,6 +3,7 @@ package gov.nasa.pds;
 import java.util.Arrays;
 
 import gov.nasa.pds.harvest.cfg.HarvestCfg;
+import gov.nasa.pds.harvest.cfg.RegistryCfg;
 import gov.nasa.pds.harvest.mq.msg.ProductMessage;
 import gov.nasa.pds.harvest.mq.rmq.ProductConsumer;
 
@@ -11,10 +12,14 @@ public class TestProductConsumer
 
     public static void main(String[] args) throws Exception
     {
-        HarvestCfg cfg = new HarvestCfg();
-        cfg.processDataFiles = false;
+        HarvestCfg harvestCfg = new HarvestCfg();
+        harvestCfg.processDataFiles = false;
+        
+        RegistryCfg registryCfg = new RegistryCfg();
+        registryCfg.url = "http://localhost:9200";
+        registryCfg.indexName = "test";
 
-        ProductConsumer consumer = new ProductConsumer(cfg);
+        ProductConsumer consumer = new ProductConsumer(harvestCfg, registryCfg);
         
         ProductMessage msg = createTestMessage();
         consumer.processMessage(msg);

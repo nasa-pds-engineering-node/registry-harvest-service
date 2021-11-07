@@ -1,6 +1,7 @@
 package gov.nasa.pds.harvest.util.out;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.Reader;
 
 import org.apache.logging.log4j.LogManager;
@@ -14,7 +15,7 @@ import gov.nasa.pds.harvest.util.CloseUtils;
  *  
  * @author karpenko
  */
-public class InventoryBatchReader
+public class InventoryBatchReader implements Closeable
 {
     private Logger log;
     private BufferedReader rd;
@@ -36,6 +37,7 @@ public class InventoryBatchReader
     /**
      * Close the reader (input file).
      */
+    @Override
     public void close()
     {
         CloseUtils.close(rd);

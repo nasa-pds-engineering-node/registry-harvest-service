@@ -109,10 +109,15 @@ public class RabbitMQClient implements MQClient
         // Connect to RabbitMQ (wait until RabbitMQ is up)
         connect();
 
-        // Start product Consumer
+        // Start product consumer
         ProductConsumerRabbitMQ productConsumer = createProductConsumer();
         productConsumer.start();
         log.info("Started product consumer");
+        
+        // Start Collection inventory consumer
+        CollectionInventoryConsumerRabbitMQ inventoryConsumer = createCollectionInventoryConsumer();
+        inventoryConsumer.start();
+        log.info("Started collection inventory consumer");
     }
 
     
@@ -163,11 +168,22 @@ public class RabbitMQClient implements MQClient
         Channel channel = rmqConnection.createChannel();
         channel.basicQos(1);
         
-        ProductConsumer genericProductConsumer = consumerFactory.createProductConsumer();
-        ProductConsumerRabbitMQ consumer = new ProductConsumerRabbitMQ(channel, genericProductConsumer);
+        ProductConsumer genericConsumer = consumerFactory.createProductConsumer();
+        ProductConsumerRabbitMQ consumer = new ProductConsumerRabbitMQ(channel, genericConsumer);
         return consumer;
     }
+
     
+    private CollectionInventoryConsumerRabbitMQ createCollectionInventoryConsumer() throws Exception
+    {
+        Channel channel = rmqConnection.createChannel();
+        channel.basicQos(1);
+        
+        CollectionInventoryConsumer genericConsumer = consumerFactory.createCollectionInventoryConsumer();
+        CollectionInventoryConsumerRabbitMQ consumer = new CollectionInventoryConsumerRabbitMQ(channel, genericConsumer);
+        return consumer;
+    }
+
     
     private static void sleepSec(int sec)
     {

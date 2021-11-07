@@ -9,6 +9,7 @@ public interface Constants
 {
     // Message queue
     public static final String MQ_PRODUCTS = "harvest.products";
+    public static final String MQ_COLLECTION_INVENTORY = "harvest.collections";
 
     // Field names
     public static final String NS_SEPARATOR = ":";
