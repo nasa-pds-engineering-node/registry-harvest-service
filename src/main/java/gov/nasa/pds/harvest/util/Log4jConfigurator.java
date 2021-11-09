@@ -1,11 +1,13 @@
 package gov.nasa.pds.harvest.util;
 
 import java.io.File;
+import java.util.UUID;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.appender.ConsoleAppender;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.apache.logging.log4j.core.config.builder.api.AppenderComponentBuilder;
+import org.apache.logging.log4j.core.config.builder.api.ComponentBuilder;
 import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilder;
 import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilderFactory;
 import org.apache.logging.log4j.core.config.builder.api.LoggerComponentBuilder;
@@ -34,7 +36,7 @@ public class Log4jConfigurator
         
         // Appenders
         addConsoleAppender(cfg, "console");
-        addFileAppender(cfg, "file", filePath);
+        addRollingFileAppender(cfg, "file", filePath);
 
         // Root logger
         RootLoggerComponentBuilder rootLog = cfg.newRootLogger(Level.OFF);
@@ -61,20 +63,25 @@ public class Log4jConfigurator
     }
     
     
-    private static void addFileAppender(ConfigurationBuilder<BuiltConfiguration> cfg, String name, String filePath)
+    private static void addRollingFileAppender(ConfigurationBuilder<BuiltConfiguration> cfg, String name, String filePath)
     {
         // Use default log name if not provided
         if(filePath == null)
         {
             File dir = new File("/tmp/harvest");
             dir.mkdirs();
-            filePath = "/tmp/harvest/harvest.log";
+            filePath = "/tmp/harvest/" + UUID.randomUUID().toString() + ".log";
         }
         
-        AppenderComponentBuilder appender = cfg.newAppender(name, "FILE");
+        ComponentBuilder<?> policy = cfg.newComponent("Policies")
+                .addComponent(cfg.newComponent("SizeBasedTriggeringPolicy").addAttribute("size", "100 MB"));
+        
+        AppenderComponentBuilder appender = cfg.newAppender(name, "RollingFile");
         appender.addAttribute("fileName", filePath);
-        appender.addAttribute("append", false);
+        appender.addAttribute("filePattern", filePath + "-%d{yyyyMMdd-HHmmss}.gz");
+        appender.addComponent(policy);
         appender.add(cfg.newLayout("PatternLayout").addAttribute("pattern", "%d [%level] %msg%n%throwable"));
+        
         cfg.add(appender);
     }
     

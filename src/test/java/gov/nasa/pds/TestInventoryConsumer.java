@@ -1,14 +1,13 @@
 package gov.nasa.pds;
 
-import java.util.Arrays;
-
 import gov.nasa.pds.harvest.cfg.HarvestCfg;
 import gov.nasa.pds.harvest.cfg.RegistryCfg;
-import gov.nasa.pds.harvest.mq.msg.ProductMessage;
-import gov.nasa.pds.harvest.mq.rmq.ProductConsumer;
+import gov.nasa.pds.harvest.mq.msg.CollectionInventoryMessage;
+import gov.nasa.pds.harvest.mq.rmq.CollectionInventoryConsumer;
 import gov.nasa.pds.harvest.util.Log4jConfigurator;
 
-public class TestProductConsumer
+
+public class TestInventoryConsumer
 {
 
     public static void main(String[] args) throws Exception
@@ -22,21 +21,19 @@ public class TestProductConsumer
         registryCfg.url = "http://localhost:9200";
         registryCfg.indexName = "t1";
 
-        ProductConsumer consumer = new ProductConsumer(harvestCfg, registryCfg);
+        CollectionInventoryConsumer consumer = new CollectionInventoryConsumer(registryCfg);
         
-        ProductMessage msg = createTestMessage();
+        CollectionInventoryMessage msg = createTestMessage();
         consumer.processMessage(msg);
     }
 
     
-    private static ProductMessage createTestMessage()
+    private static CollectionInventoryMessage createTestMessage()
     {
-        ProductMessage msg = new ProductMessage();
+        CollectionInventoryMessage msg = new CollectionInventoryMessage();
         msg.jobId = "TestJob123";
-        msg.nodeName = "TestNode";
-        msg.overwrite = true;
-        msg.files = Arrays.asList("/tmp/d5/orex.xml");
-        msg.lidvids = Arrays.asList("lidvid:test:1234::1.0");
+        msg.inventoryFile = "/ws3/OREX/orex_spice/spice_kernels/collection_spice_kernels_inventory_v008.csv";
+        msg.collectionLidvid = "urn:nasa:pds:orex.spice:spice_kernels::8.0";
         
         return msg;
     }

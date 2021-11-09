@@ -47,7 +47,7 @@ public class CollectionInventoryProcessor
     public CollectionInventoryProcessor(RegistryCfg cfg) throws Exception
     {
         log = LogManager.getLogger(this.getClass());
-        loader = new DataLoader(cfg);
+        loader = new DataLoader(cfg.url, cfg.indexName + "-refs", cfg.authFile);
     }
     
     
@@ -65,7 +65,7 @@ public class CollectionInventoryProcessor
     public void writeCollectionInventory(String collectionLidVid, File inventoryFile, String jobId) throws Exception
     {
         writeRefs(collectionLidVid, inventoryFile, jobId, RefType.PRIMARY);
-        writeRefs(collectionLidVid, inventoryFile, jobId, RefType.PRIMARY);
+        writeRefs(collectionLidVid, inventoryFile, jobId, RefType.SECONDARY);
     }
     
     

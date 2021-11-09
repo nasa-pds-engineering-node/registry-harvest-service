@@ -18,6 +18,11 @@ import gov.nasa.pds.harvest.util.ExceptionUtils;
 import gov.nasa.pds.harvest.util.out.RegistryDocWriter;
 
 
+/**
+ * Generic product message consumer. 
+ * It doesn't have any message server-specific code (RabbitMQ or ActiveMQ).
+ * @author karpenko
+ */
 public class ProductConsumer
 {
     private Logger log;
@@ -28,6 +33,12 @@ public class ProductConsumer
     private DataLoader dataLoader;
     
     
+    /**
+     * Constructor
+     * @param harvestCfg Harvest server configuration
+     * @param registryCfg Registry / Elasticsearch configuration
+     * @throws Exception an exception
+     */
     public ProductConsumer(HarvestCfg harvestCfg, RegistryCfg registryCfg) throws Exception
     {
         log = LogManager.getLogger(this.getClass());
@@ -37,10 +48,15 @@ public class ProductConsumer
         registryDocWriter = new RegistryDocWriter();
         proc = new ProductProcessor(harvestCfg, registryDocWriter);
         
-        dataLoader = new DataLoader(registryCfg);
+        dataLoader = new DataLoader(registryCfg.url, registryCfg.indexName, registryCfg.authFile);
     }
     
     
+    /**
+     * Process product message
+     * @param msg product message
+     * @return true is the message was processed. False if the message could not be processed.
+     */
     public boolean processMessage(ProductMessage msg)
     {
         if(msg.files == null || msg.files.isEmpty()) return true;

@@ -43,7 +43,7 @@ public class ConsumerFactory
      */
     public CollectionInventoryConsumer createCollectionInventoryConsumer() throws Exception
     {
-        CollectionInventoryConsumer consumer = new CollectionInventoryConsumer();
+        CollectionInventoryConsumer consumer = new CollectionInventoryConsumer(registryCfg);
         return consumer;
     }
 
