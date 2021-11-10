@@ -9,13 +9,13 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import gov.nasa.pds.harvest.Constants;
 import gov.nasa.pds.harvest.job.Job;
 import gov.nasa.pds.harvest.meta.FieldMap;
+import gov.nasa.pds.harvest.util.xml.NsUtils;
 import gov.nasa.pds.harvest.util.xml.XmlDomUtils;
 import gov.nasa.pds.registry.common.util.date.PdsDateConverter;
 
@@ -68,9 +68,9 @@ public class AutogenExtractor
      * @param job Harvest job configuration parameters
      * @throws Exception an exception
      */
-    public void extract(Document doc, FieldMap fields, Job job) throws Exception
+    private void extract(Document doc, FieldMap fields, Job job) throws Exception
     {
-        this.localNsMap = getDocNamespaces(doc);
+        this.localNsMap = NsUtils.getNamespaces(doc).uri2prefix;
         this.fields = fields;
         this.job = job;
         
@@ -155,27 +155,4 @@ public class AutogenExtractor
                 + ". Please declare this namespace in Harvest configuration file.");
     }
     
-    
-    private static Map<String, String> getDocNamespaces(Document doc)
-    {
-        Element root = doc.getDocumentElement();
-        NamedNodeMap attrs = root.getAttributes();
-
-        Map<String, String> map = new HashMap<>();
-        
-        for(int i = 0; i < attrs.getLength(); i++)
-        {
-            Node attr = attrs.item(i);
-            String name = attr.getNodeName();
-            if(name.startsWith("xmlns:"))
-            {
-                name = name.substring(6);
-                String uri = attr.getNodeValue();
-                map.put(uri, name);
-            }
-        }
-
-        return map;
-    }
-
 }
