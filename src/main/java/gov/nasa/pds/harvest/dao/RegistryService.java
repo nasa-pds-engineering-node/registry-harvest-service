@@ -41,7 +41,7 @@ public class RegistryService
     {
         List<String> fileList = new ArrayList<>();
 
-        RegistryDAO dao = RegistryManager.getInstance().getRegistryDAO();
+        RegistryDao dao = RegistryManager.getInstance().getRegistryDAO();
 
         // Call Elasticsearch to get unregistered products.
         // Retry MAX_RETRIES times on an error.

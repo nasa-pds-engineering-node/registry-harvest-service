@@ -19,7 +19,8 @@ public class RegistryManager
     private static RegistryManager instance = null;
     
     private RestClient esClient;
-    private RegistryDAO registryDAO;
+    private RegistryDao registryDao;
+    private SchemaDao schemaDao;
     
     
     /**
@@ -43,7 +44,8 @@ public class RegistryManager
         log.info("Registry URL: " + cfg.url);
         log.info("Registry index: " + indexName);
         
-        registryDAO = new RegistryDAO(esClient, indexName);
+        registryDao = new RegistryDao(esClient, indexName);
+        schemaDao = new SchemaDao(esClient);
     }
     
     
@@ -84,8 +86,19 @@ public class RegistryManager
      * Get registry DAO object.
      * @return Registry DAO
      */
-    public RegistryDAO getRegistryDAO()
+    public RegistryDao getRegistryDAO()
     {
-        return registryDAO;
+        return registryDao;
     }
+
+
+    /**
+     * Get schema DAO object.
+     * @return Schema DAO
+     */
+    public SchemaDao getSchemaDAO()
+    {
+        return schemaDao;
+    }
+
 }

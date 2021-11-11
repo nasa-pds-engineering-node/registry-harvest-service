@@ -3,12 +3,17 @@ package gov.nasa.pds.harvest.util.out;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.google.gson.stream.JsonWriter;
 
+import gov.nasa.pds.harvest.Constants;
 import gov.nasa.pds.harvest.meta.FieldMap;
+import gov.nasa.pds.harvest.meta.FieldNameCache;
 import gov.nasa.pds.harvest.meta.Metadata;
+import gov.nasa.pds.harvest.util.xml.XmlNamespaces;
 
 
 /**
@@ -18,41 +23,71 @@ import gov.nasa.pds.harvest.meta.Metadata;
  */
 public class RegistryDocWriter
 {
-    private List<String> data;
+    private List<String> jsonData;
+    private Set<String> missingFields;
+    private Set<String> missingXsds;
     
     /**
      * Constructor
      */
     public RegistryDocWriter()
     {
-        data = new ArrayList<>();
+        jsonData = new ArrayList<>();
+        missingFields = new HashSet<>();
+        missingXsds = new HashSet<>();
     }
 
     
+    /**
+     * Get NJSON data to be loaded into Elasticsearch
+     * @return NJSON data (Two JSON entries per Elasticsearch document - (1) id, (2) data.
+     */
     public List<String> getData()
     {
-        return data;
+        return jsonData;
+    }
+    
+
+    /**
+     * Get field names missing from Elasticsearch schema.
+     * @return a set of field names
+     */
+    public Set<String> getMissingFields()
+    {
+        return missingFields;
+    }
+
+    /**
+     * Get XSD URLs for missing fields. 
+     * @return a set of XSD URLs for missing fields.
+     */
+    public Set<String> getMissingXsds()
+    {
+        return missingXsds;
     }
     
     
     public void clearData()
     {
-        data.clear();
+        jsonData.clear();
+        missingFields.clear();
+        missingXsds.clear();
     }
     
     
     /**
      * Write metadata extracted from PDS4 labels.
      * @param meta metadata extracted from PDS4 label.
+     * @param nsInfo XML namespace and schema location mappings
      * @param jobId Harvest job id
      * @throws Exception Generic exception
      */
-    public void write(Metadata meta, String jobId) throws Exception
+    public void write(Metadata meta, XmlNamespaces nsInfo, String jobId) throws Exception
     {
         // First line: primary key 
         String lidvid = meta.lid + "::" + meta.vid;
         String pkJson = NDJsonDocUtils.createPKJson(lidvid);
-        data.add(pkJson);
+        jsonData.add(pkJson);
         
         // Second line: main document
 
@@ -72,21 +107,21 @@ public class RegistryDocWriter
         NDJsonDocUtils.writeField(jw, "_package_id", jobId);
         
         // References
-        write(jw, meta.intRefs);
+        write(jw, meta.intRefs, nsInfo);
         
         // Other Fields
-        write(jw, meta.fields);
+        write(jw, meta.fields, nsInfo);
         
         jw.endObject();
         
         jw.close();
 
         String dataJson = sw.getBuffer().toString();
-        data.add(dataJson);
+        jsonData.add(dataJson);
     }
 
 
-    private void write(JsonWriter jw, FieldMap fmap) throws Exception
+    private void write(JsonWriter jw, FieldMap fmap, XmlNamespaces xmlns) throws Exception
     {
         if(fmap == null || fmap.isEmpty()) return;
         
@@ -100,9 +135,33 @@ public class RegistryDocWriter
                 continue;
             }
 
-            //allFields.add(key);
             NDJsonDocUtils.writeField(jw, key, values);
+            
+            // Check if current Elasticsearch schema has this field.
+            if(!FieldNameCache.getInstance().containsName(key))
+            {
+                // Missing fields
+                missingFields.add(key);
+                
+                // Missing XSDs
+                String xsd = getFieldXsd(key, xmlns);
+                if(xsd != null)
+                {
+                    missingXsds.add(xsd);
+                }
+            }
         }
     }
 
+    
+    private String getFieldXsd(String name, XmlNamespaces xmlns)
+    {
+        int idx = name.indexOf(Constants.NS_SEPARATOR);
+        if(idx <= 0) return null;
+        
+        String prefix = name.substring(0, idx);
+        String xsd = xmlns.prefix2location.get(prefix);
+        
+        return xsd;
+    }
 }
