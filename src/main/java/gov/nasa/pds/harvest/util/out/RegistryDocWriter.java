@@ -11,6 +11,7 @@ import com.google.gson.stream.JsonWriter;
 
 import gov.nasa.pds.harvest.Constants;
 import gov.nasa.pds.harvest.meta.FieldMap;
+import gov.nasa.pds.harvest.meta.FieldMapSet;
 import gov.nasa.pds.harvest.meta.FieldNameCache;
 import gov.nasa.pds.harvest.meta.Metadata;
 import gov.nasa.pds.harvest.util.xml.XmlNamespaces;
@@ -25,8 +26,8 @@ public class RegistryDocWriter
 {
     private List<String> jsonData;
     private Set<String> missingFields;
-    private Set<String> missingXsds;
-    
+    private FieldMapSet missingXsds;
+
     /**
      * Constructor
      */
@@ -34,7 +35,7 @@ public class RegistryDocWriter
     {
         jsonData = new ArrayList<>();
         missingFields = new HashSet<>();
-        missingXsds = new HashSet<>();
+        missingXsds = new FieldMapSet();
     }
 
     
@@ -61,7 +62,7 @@ public class RegistryDocWriter
      * Get XSD URLs for missing fields. 
      * @return a set of XSD URLs for missing fields.
      */
-    public Set<String> getMissingXsds()
+    public FieldMapSet getMissingXsds()
     {
         return missingXsds;
     }
@@ -140,28 +141,25 @@ public class RegistryDocWriter
             // Check if current Elasticsearch schema has this field.
             if(!FieldNameCache.getInstance().containsName(key))
             {
-                // Missing fields
+                // Update missing fields and XSDs
                 missingFields.add(key);
-                
-                // Missing XSDs
-                String xsd = getFieldXsd(key, xmlns);
-                if(xsd != null)
-                {
-                    missingXsds.add(xsd);
-                }
+                updateMissingXsds(key, xmlns);
             }
         }
     }
 
     
-    private String getFieldXsd(String name, XmlNamespaces xmlns)
+    private void updateMissingXsds(String name, XmlNamespaces xmlns)
     {
         int idx = name.indexOf(Constants.NS_SEPARATOR);
-        if(idx <= 0) return null;
+        if(idx <= 0) return;
         
         String prefix = name.substring(0, idx);
         String xsd = xmlns.prefix2location.get(prefix);
-        
-        return xsd;
+ 
+        if(xsd != null)
+        {
+            missingXsds.addValue(prefix, xsd);
+        }
     }
 }

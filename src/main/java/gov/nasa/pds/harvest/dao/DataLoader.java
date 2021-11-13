@@ -1,6 +1,8 @@
 package gov.nasa.pds.harvest.dao;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -30,6 +32,10 @@ import gov.nasa.pds.registry.common.es.client.HttpConnectionFactory;
  */
 public class DataLoader
 {
+    private int printProgressSize = 5000;
+    private int batchSize = 100;
+    private int totalRecords;
+    
     private Logger log;
     private HttpConnectionFactory conFactory; 
 
@@ -113,6 +119,158 @@ public class DataLoader
         }
     }
     
+    
+    /**
+     * Set data batch size
+     * @param size batch size
+     */
+    public void setBatchSize(int size)
+    {
+        if(size <= 0) throw new IllegalArgumentException("Batch size should be > 0");
+        this.batchSize = size;
+    }
+
+    
+    /**
+     * Load data from an NJSON (new-line-delimited JSON) file into Elasticsearch.
+     * @param file NJSON (new-line-delimited JSON) file to load
+     * @throws Exception an exception
+     */
+    public void loadFile(File file) throws Exception
+    {
+        log.info("Loading ES data file: " + file.getAbsolutePath());
+        
+        BufferedReader rd = new BufferedReader(new FileReader(file));
+        loadData(rd);
+    }
+
+    
+    /**
+     * Load NJSON data from a reader.
+     * @param rd reader
+     * @throws Exception an exception
+     */
+    private void loadData(BufferedReader rd) throws Exception
+    {
+        totalRecords = 0;
+        
+        try
+        {
+            String firstLine = rd.readLine();
+            // File is empty
+            if(firstLine == null || firstLine.isEmpty()) return;
+            
+            while((firstLine = loadBatch(rd, firstLine)) != null)
+            {
+                if(totalRecords % printProgressSize == 0)
+                {
+                    log.info("Loaded " + totalRecords + " document(s)");
+                }
+            }
+            
+            log.info("Loaded " + totalRecords + " document(s)");
+        }
+        finally
+        {
+            CloseUtils.close(rd);
+        }
+    }
+
+    
+    /**
+     * Load next batch of NJSON (new-line-delimited JSON) data.
+     * @param fileReader Reader object with NJSON data.
+     * @param firstLine NJSON file has 2 lines per record: 1 - primary key, 2 - data record.
+     * This is the primary key line.
+     * @return First line of 2-line NJSON record (line 1: primary key, line 2: data)
+     * @throws Exception an exception
+     */
+    private String loadBatch(BufferedReader fileReader, String firstLine) throws Exception
+    {
+        HttpURLConnection con = null;
+        
+        try
+        {
+            con = conFactory.createConnection();
+            con.setDoInput(true);
+            con.setDoOutput(true);
+            con.setRequestMethod("POST");
+            con.setRequestProperty("content-type", "application/x-ndjson; charset=utf-8");
+            
+            OutputStreamWriter writer = new OutputStreamWriter(con.getOutputStream(), "UTF-8");
+            
+            // First record
+            String line1 = firstLine;
+            String line2 = fileReader.readLine();
+            if(line2 == null) throw new Exception("Premature end of file");
+            
+            writer.write(line1);
+            writer.write("\n");
+            writer.write(line2);
+            writer.write("\n");
+            
+            int numRecords = 1;
+            while(numRecords < batchSize)
+            {
+                line1 = fileReader.readLine();
+                if(line1 == null) break;
+                
+                line2 = fileReader.readLine();
+                if(line2 == null) throw new Exception("Premature end of file");
+                
+                writer.write(line1);
+                writer.write("\n");
+                writer.write(line2);
+                writer.write("\n");
+                
+                numRecords++;
+            }
+            
+            if(numRecords == batchSize)
+            {
+                // Let's find out if there are more records
+                line1 = fileReader.readLine();
+                if(line1 != null && line1.isEmpty()) line1 = null;
+            }
+            
+            writer.flush();
+            writer.close();
+        
+            // Check for Elasticsearch errors.
+            String respJson = getLastLine(con.getInputStream());
+            log.debug(respJson);
+            
+            if(responseHasErrors(respJson))
+            {
+                throw new Exception("Could not load data.");
+            }
+            
+            totalRecords += numRecords;
+
+            return line1;
+        }
+        catch(UnknownHostException ex)
+        {
+            throw new Exception("Unknown host " + conFactory.getHostName());
+        }
+        catch(IOException ex)
+        {
+            // Get HTTP response code
+            int respCode = getResponseCode(con);
+            if(respCode <= 0) throw ex;
+            
+            // Try extracting JSON from multi-line error response (last line) 
+            String json = getLastLine(con.getErrorStream());
+            if(json == null) throw ex;
+            
+            // Parse error JSON to extract reason.
+            String msg = EsUtils.extractReasonFromJson(json);
+            if(msg == null) msg = json;
+            
+            throw new Exception(msg);
+        }
+    }
+
     
     @SuppressWarnings({ "rawtypes", "unchecked" })
     private boolean responseHasErrors(String resp)

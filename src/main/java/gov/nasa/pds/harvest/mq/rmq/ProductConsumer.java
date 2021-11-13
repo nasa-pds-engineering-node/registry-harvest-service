@@ -2,6 +2,7 @@ package gov.nasa.pds.harvest.mq.rmq;
 
 import java.io.File;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -10,8 +11,11 @@ import gov.nasa.pds.harvest.cfg.HarvestCfg;
 import gov.nasa.pds.harvest.cfg.RegistryCfg;
 import gov.nasa.pds.harvest.dao.DataLoader;
 import gov.nasa.pds.harvest.dao.RegistryService;
+import gov.nasa.pds.harvest.dd.LddLoader;
+import gov.nasa.pds.harvest.dd.LddUtils;
 import gov.nasa.pds.harvest.job.Job;
 import gov.nasa.pds.harvest.job.JobFactory;
+import gov.nasa.pds.harvest.meta.FieldMapSet;
 import gov.nasa.pds.harvest.mq.msg.ProductMessage;
 import gov.nasa.pds.harvest.proc.ProductProcessor;
 import gov.nasa.pds.harvest.util.ExceptionUtils;
@@ -31,6 +35,7 @@ public class ProductConsumer
     private RegistryDocWriter registryDocWriter;
     private ProductProcessor proc;
     private DataLoader dataLoader;
+    private LddLoader lddLoader;
     
     
     /**
@@ -49,6 +54,8 @@ public class ProductConsumer
         proc = new ProductProcessor(harvestCfg, registryDocWriter);
         
         dataLoader = new DataLoader(registryCfg.url, registryCfg.indexName, registryCfg.authFile);
+        lddLoader = new LddLoader(registryCfg.url, registryCfg.indexName, registryCfg.authFile);
+        lddLoader.loadPds2EsDataTypeMap(LddUtils.getPds2EsDataTypeCfgFile());
     }
     
     
@@ -108,12 +115,16 @@ public class ProductConsumer
             }
         }
         
-        // Get cached JSON data
-        List<String> data = registryDocWriter.getData();
-
+        // Update Elasticsearch schema if needed
+        if(!registryDocWriter.getMissingFields().isEmpty())
+        {
+            updateSchema(registryDocWriter.getMissingFields(), registryDocWriter.getMissingXsds());
+        }
+        
         // Load the data into Elasticsearch
         try
         {
+            List<String> data = registryDocWriter.getData();
             dataLoader.loadBatch(data);
         }
         catch(Exception ex)
@@ -126,4 +137,14 @@ public class ProductConsumer
     }
     
 
+    private void updateSchema(Set<String> fields, FieldMapSet xsds)
+    {
+        System.out.println("Update schema:");
+        System.out.println(fields);
+        for(String prefix: xsds.getNames())
+        {
+            System.out.println(prefix + "  -->  " + xsds.getValues(prefix));
+        }
+        
+    }
 }

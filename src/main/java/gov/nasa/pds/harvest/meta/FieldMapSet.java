@@ -46,6 +46,15 @@ public class FieldMapSet implements FieldMap
     }
     
     
+    /**
+     * Remove all the fields from the map
+     */
+    public void clear()
+    {
+        fields.clear();
+    }
+    
+    
     private Set<String> getOrCreateValues(String fieldName)
     {
         if(fieldName == null) throw new IllegalArgumentException("Field name is null");

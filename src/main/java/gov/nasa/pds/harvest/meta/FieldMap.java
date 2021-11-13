@@ -19,4 +19,5 @@ public interface FieldMap
     
     public boolean isEmpty();
     public int size();
+    public void clear();    
 }
