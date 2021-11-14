@@ -45,7 +45,7 @@ public class RegistryManager
         log.info("Registry index: " + indexName);
         
         registryDao = new RegistryDao(esClient, indexName);
-        schemaDao = new SchemaDao(esClient);
+        schemaDao = new SchemaDao(esClient, indexName);
     }
     
     

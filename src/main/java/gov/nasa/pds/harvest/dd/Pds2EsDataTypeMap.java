@@ -90,7 +90,7 @@ public class Pds2EsDataTypeMap
     {
         if(file == null) return;
         
-        log.debug("Loading PDS to ES data type mapping from " + file.getAbsolutePath());
+        log.info("Loading PDS to ES data type mapping from " + file.getAbsolutePath());
         
         BufferedReader rd = null;
         

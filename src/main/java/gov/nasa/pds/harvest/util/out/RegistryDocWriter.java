@@ -3,15 +3,16 @@ package gov.nasa.pds.harvest.util.out;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.google.gson.stream.JsonWriter;
 
 import gov.nasa.pds.harvest.Constants;
 import gov.nasa.pds.harvest.meta.FieldMap;
-import gov.nasa.pds.harvest.meta.FieldMapSet;
 import gov.nasa.pds.harvest.meta.FieldNameCache;
 import gov.nasa.pds.harvest.meta.Metadata;
 import gov.nasa.pds.harvest.util.xml.XmlNamespaces;
@@ -26,7 +27,7 @@ public class RegistryDocWriter
 {
     private List<String> jsonData;
     private Set<String> missingFields;
-    private FieldMapSet missingXsds;
+    private Map<String, String> missingXsds;
 
     /**
      * Constructor
@@ -35,7 +36,7 @@ public class RegistryDocWriter
     {
         jsonData = new ArrayList<>();
         missingFields = new HashSet<>();
-        missingXsds = new FieldMapSet();
+        missingXsds = new HashMap<>();
     }
 
     
@@ -60,9 +61,10 @@ public class RegistryDocWriter
 
     /**
      * Get XSD URLs for missing fields. 
-     * @return a set of XSD URLs for missing fields.
+     * @return a map of XSD URLs and XML namespace prefixes for missing fields.
+     * key = XSD URL, value = namespace prefix
      */
-    public FieldMapSet getMissingXsds()
+    public Map<String, String> getMissingXsds()
     {
         return missingXsds;
     }
@@ -159,7 +161,7 @@ public class RegistryDocWriter
  
         if(xsd != null)
         {
-            missingXsds.addValue(prefix, xsd);
+            missingXsds.put(xsd, prefix);
         }
     }
 }

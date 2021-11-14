@@ -18,17 +18,21 @@ public class TestProductConsumer
 
     public static void main(String[] args) throws Exception
     {
-        Configuration cfg = createConfiguration();
-        Log4jConfigurator.configure("INFO", "/tmp/t.log");
-        initRegistry(cfg.registryCfg);
-        
-        ProductConsumer consumer = new ProductConsumer(cfg.harvestCfg, cfg.registryCfg);
-        
-        ProductMessage msg = createTestMessage();
-        consumer.processMessage(msg);
-        
-        
-        RegistryManager.destroy();
+        try
+        {
+            Configuration cfg = createConfiguration();
+            Log4jConfigurator.configure("INFO", "/tmp/t.log");
+            initRegistry(cfg.registryCfg);
+            
+            ProductConsumer consumer = new ProductConsumer(cfg.harvestCfg, cfg.registryCfg);
+            
+            ProductMessage msg = createTestMessage();
+            consumer.processMessage(msg);
+        }
+        finally
+        {
+            RegistryManager.destroy();
+        }
     }
 
     
@@ -37,7 +41,7 @@ public class TestProductConsumer
         RegistryManager.init(cfg);
 
         SchemaDao schemaDao = RegistryManager.getInstance().getSchemaDAO();
-        Set<String> fields = schemaDao.getFieldNames(cfg.indexName);
+        Set<String> fields = schemaDao.getFieldNames();
         FieldNameCache.getInstance().set(fields);
     }
     

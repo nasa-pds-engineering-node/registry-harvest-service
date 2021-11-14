@@ -2,6 +2,7 @@ package gov.nasa.pds.harvest.mq.rmq;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
@@ -10,12 +11,14 @@ import org.apache.logging.log4j.Logger;
 import gov.nasa.pds.harvest.cfg.HarvestCfg;
 import gov.nasa.pds.harvest.cfg.RegistryCfg;
 import gov.nasa.pds.harvest.dao.DataLoader;
+import gov.nasa.pds.harvest.dao.RegistryManager;
 import gov.nasa.pds.harvest.dao.RegistryService;
+import gov.nasa.pds.harvest.dao.SchemaDao;
+import gov.nasa.pds.harvest.dao.Tuple;
 import gov.nasa.pds.harvest.dd.LddLoader;
 import gov.nasa.pds.harvest.dd.LddUtils;
 import gov.nasa.pds.harvest.job.Job;
 import gov.nasa.pds.harvest.job.JobFactory;
-import gov.nasa.pds.harvest.meta.FieldMapSet;
 import gov.nasa.pds.harvest.mq.msg.ProductMessage;
 import gov.nasa.pds.harvest.proc.ProductProcessor;
 import gov.nasa.pds.harvest.util.ExceptionUtils;
@@ -112,13 +115,24 @@ public class ProductConsumer
             catch(Exception ex)
             {
                 log.error("Could not process file " + file.getAbsolutePath() + ": " + ExceptionUtils.getMessage(ex));
+                // Ignore this file
             }
         }
         
         // Update Elasticsearch schema if needed
         if(!registryDocWriter.getMissingFields().isEmpty())
         {
-            updateSchema(registryDocWriter.getMissingFields(), registryDocWriter.getMissingXsds());
+            try
+            {
+                updateSchema(registryDocWriter.getMissingFields(), registryDocWriter.getMissingXsds());
+            }
+            catch(Exception ex)
+            {
+                log.error("Could not update Elasticsearch schema. " + ExceptionUtils.getMessage(ex));
+                // TODO: Fix 
+                // Ignore the whole batch for now
+                return true;
+            }
         }
         
         // Load the data into Elasticsearch
@@ -129,7 +143,7 @@ public class ProductConsumer
         }
         catch(Exception ex)
         {
-            log.error(ExceptionUtils.getMessage(ex));
+            log.error("Could not load data into Elasticsearch." + ExceptionUtils.getMessage(ex));
             return false;
         }
         
@@ -137,14 +151,15 @@ public class ProductConsumer
     }
     
 
-    private void updateSchema(Set<String> fields, FieldMapSet xsds)
+    private void updateSchema(Set<String> fields, Map<String, String> xsds) throws Exception
     {
         System.out.println("Update schema:");
         System.out.println(fields);
-        for(String prefix: xsds.getNames())
-        {
-            System.out.println(prefix + "  -->  " + xsds.getValues(prefix));
-        }
+        xsds.forEach((key, value) -> {
+            System.out.println(key + " --> " + value);
+        });
         
+        SchemaDao dao = RegistryManager.getInstance().getSchemaDAO();
+        List<Tuple> info = dao.getDataTypes(fields);
     }
 }

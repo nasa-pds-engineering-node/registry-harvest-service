@@ -1,10 +1,14 @@
 package gov.nasa.pds.harvest.dao;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
@@ -21,26 +25,29 @@ import gov.nasa.pds.registry.common.es.client.SearchResponseParser;
  */
 public class SchemaDao
 {
+    private Logger log;
     private RestClient client;
-    
+    private String indexName;
     
     /**
      * Constructor
      * @param client Elasticsearch client
+     * @param indexName Elasticsearch index name
      */
-    public SchemaDao(RestClient client)
+    public SchemaDao(RestClient client, String indexName)
     {
+        log = LogManager.getLogger(this.getClass());
         this.client = client;
+        this.indexName = indexName;
     }
     
     
     /**
      * Call Elasticsearch "mappings" API to get a list of field names.
-     * @param indexName Elasticsearch index name
      * @return a collection of field names
      * @throws Exception an exception
      */
-    public Set<String> getFieldNames(String indexName) throws Exception
+    public Set<String> getFieldNames() throws Exception
     {
         Request req = new Request("GET", "/" + indexName + "/_mappings");
         Response resp = client.performRequest(req);
@@ -117,22 +124,15 @@ public class SchemaDao
     
     /**
      * Query Elasticsearch data dictionary to get data types for a list of field ids.
-     * @param indexName Elasticsearch index name, e.g., "registry".
      * @param ids A list of field IDs, e.g., "pds:Array_3D/pds:axes".
-     * @param stopOnFirstMissing If true, throw DataTypeNotFoundException on first 
-     * field missing from Elasticsearch data dictionary. 
-     * If false, process all missing fields in a batch to create a list of 
-     * missing namespaces. Don't throw DataTypeNotFoundException.  
      * @return Data types information object
-     * @throws Exception DataTypeNotFoundException, IOException, etc.
+     * @throws Exception an exception.
      */
-    public DataTypesInfo getDataTypes(String indexName, Collection<String> ids, 
-            boolean stopOnFirstMissing) throws Exception
+    public List<Tuple> getDataTypes(Collection<String> ids) throws Exception
     {
-        if(indexName == null) throw new IllegalArgumentException("Index name is null");
+        if(ids == null || ids.isEmpty()) return null;
 
-        DataTypesInfo dtInfo = new DataTypesInfo();
-        if(ids == null || ids.isEmpty()) return dtInfo;
+        List<Tuple> dtInfo = new ArrayList<Tuple>();
         
         // Create request
         Request req = new Request("GET", "/" + indexName + "-dd/_mget?_source=es_data_type");
@@ -151,45 +151,24 @@ public class SchemaDao
         {
             if(rec.found)
             {
-                dtInfo.newFields.add(new Tuple(rec.id, rec.esDataType));
+                dtInfo.add(new Tuple(rec.id, rec.esDataType));
             }
             // There is no data type for this field in ES registry-dd index
             else
             {
                 // Automatically assign data type for known fields
-                if(rec.id.startsWith("ref_lid_") || rec.id.startsWith("ref_lidvid_") 
-                        || rec.id.endsWith("_Area")) 
+                if(rec.id.startsWith("ref_lid_") || rec.id.startsWith("ref_lidvid_"))
                 {
-                    dtInfo.newFields.add(new Tuple(rec.id, "keyword"));
+                    dtInfo.add(new Tuple(rec.id, "keyword"));
                     continue;
                 }
-                
-                if(stopOnFirstMissing) throw new DataTypeNotFoundException(rec.id);
-                
-                // Get field namespace
-                String ns = getFieldNamespace(rec.id);
-                if(ns == null) throw new DataTypeNotFoundException(rec.id);
-                
-                dtInfo.missingNamespaces.add(ns);
-                dtInfo.lastMissingField = rec.id;
+
+                log.warn("Could not find datatype for field " + rec.id + ". Will use 'keyword'");
+                dtInfo.add(new Tuple(rec.id, "keyword"));
             }
         }
         
         return dtInfo;
     }
-    
-    
-    /**
-     * Extract class namespace from a field ID.
-     * @param fieldId Standard PDS registry field id "namespace:Class/namespace:field".
-     * @return class namespace
-     */
-    private static String getFieldNamespace(String fieldId)
-    {
-        int idx = fieldId.indexOf(':');
-        if(idx < 1) return null;
         
-        return fieldId.substring(0, idx);
-    }
-
 }
