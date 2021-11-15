@@ -1,6 +1,7 @@
 package gov.nasa.pds.harvest;
 
 import java.io.File;
+import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -12,9 +13,12 @@ import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
 import gov.nasa.pds.harvest.cfg.Configuration;
 import gov.nasa.pds.harvest.cfg.ConfigurationReader;
+import gov.nasa.pds.harvest.cfg.RegistryCfg;
 import gov.nasa.pds.harvest.dao.RegistryManager;
+import gov.nasa.pds.harvest.dao.SchemaDao;
 import gov.nasa.pds.harvest.http.MemoryServlet;
 import gov.nasa.pds.harvest.http.StatusServlet;
+import gov.nasa.pds.harvest.meta.FieldNameCache;
 import gov.nasa.pds.harvest.mq.MQClient;
 import gov.nasa.pds.harvest.mq.rmq.ConsumerFactory;
 import gov.nasa.pds.harvest.mq.rmq.RabbitMQClient;
@@ -83,7 +87,7 @@ public class HarvestServer
         try
         {
             // Init registry (elasticsearch) manager
-            RegistryManager.init(cfg.registryCfg);
+            initRegistry(cfg.registryCfg);
             
             // Start embedded web server
             startWebServer(cfg.webPort);
@@ -100,6 +104,16 @@ public class HarvestServer
         return 0;
     }
 
+    
+    private void initRegistry(RegistryCfg cfg) throws Exception
+    {
+        RegistryManager.init(cfg);
+
+        SchemaDao schemaDao = RegistryManager.getInstance().getSchemaDAO();
+        Set<String> fields = schemaDao.getFieldNames();
+        FieldNameCache.getInstance().set(fields);
+    }
+    
     
     /**
      * Start embedded web server

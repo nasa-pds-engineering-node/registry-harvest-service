@@ -153,13 +153,14 @@ public class ProductConsumer
 
     private void updateSchema(Set<String> fields, Map<String, String> xsds) throws Exception
     {
-        System.out.println("Update schema:");
-        System.out.println(fields);
-        xsds.forEach((key, value) -> {
-            System.out.println(key + " --> " + value);
-        });
+        log.info("Updating Elasticsearch schema.");
         
         SchemaDao dao = RegistryManager.getInstance().getSchemaDAO();
-        List<Tuple> info = dao.getDataTypes(fields);
+        List<Tuple> newFields = dao.getDataTypes(fields);
+        if(newFields != null)
+        {
+            dao.updateSchema(newFields);
+            log.info("Updated " + newFields.size() + " fields");
+        }
     }
 }

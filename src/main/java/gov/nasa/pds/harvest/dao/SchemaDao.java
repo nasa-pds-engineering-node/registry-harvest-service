@@ -1,6 +1,5 @@
 package gov.nasa.pds.harvest.dao;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -63,7 +62,12 @@ public class SchemaDao
      */
     private static class GetLddDateRespParser extends SearchResponseParser implements SearchResponseParser.Callback
     {
-        public Instant date = null;
+        public LddInfo info;
+        
+        public GetLddDateRespParser()
+        {
+            info = new LddInfo();
+        }
         
         @Override
         public void onRecord(String id, Object rec) throws Exception
@@ -72,10 +76,12 @@ public class SchemaDao
             {
                 @SuppressWarnings("rawtypes")
                 Map map = (Map)rec;
+                
                 String strDate = (String)map.get("date");
-                if(strDate == null) return;
-
-                date = Instant.parse(strDate);
+                info.updateDate(strDate);
+                
+                String file = (String)map.get("attr_name");
+                info.addSchemaFile(file);
             }
         }
     }
@@ -88,7 +94,7 @@ public class SchemaDao
      * @return ISO instant class representing LDD date.
      * @throws Exception an exception
      */
-    public Instant getLddDate(String indexName, String namespace) throws Exception
+    public LddInfo getLddInfo(String namespace) throws Exception
     {
         SchemaRequestBuilder bld = new SchemaRequestBuilder();
         String json = bld.createGetLddInfoRequest(namespace);
@@ -99,17 +105,16 @@ public class SchemaDao
         
         GetLddDateRespParser parser = new GetLddDateRespParser();
         parser.parseResponse(resp, parser); 
-        return parser.date;
+        return parser.info;
     }
     
     
     /**
      * Add new fields to Elasticsearch schema.
-     * @param indexName Elasticsearch index to update, e.g., "registry".
      * @param fields A list of fields to add. Each field tuple has a name and a data type.
      * @throws Exception an exception
      */
-    public void updateSchema(String indexName, List<Tuple> fields) throws Exception
+    public void updateSchema(List<Tuple> fields) throws Exception
     {
         if(fields == null || fields.isEmpty()) return;
         

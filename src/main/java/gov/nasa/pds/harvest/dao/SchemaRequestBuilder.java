@@ -118,16 +118,20 @@ public class SchemaRequestBuilder
         JsonWriter jw = createJsonWriter(wr);
 
         jw.beginObject();
-
+        // Size (number of records to return)
+        jw.name("size").value(1000);
+        
         // Start query
         jw.name("query");
         jw.beginObject();
-        jw.name("ids");
+        jw.name("bool");
         jw.beginObject();
-        
-        jw.name("values");
+
+        jw.name("must");
         jw.beginArray();
-        jw.value("registry:LDD_Info/registry:" + namespace);
+        appendMatch(jw, "class_ns", "registry");
+        appendMatch(jw, "class_name", "LDD_Info");
+        appendMatch(jw, "attr_ns", namespace);
         jw.endArray();
         
         jw.endObject();
@@ -137,7 +141,7 @@ public class SchemaRequestBuilder
         // Start source
         jw.name("_source");
         jw.beginArray();
-        jw.value("date").value("version");
+        jw.value("date").value("attr_name");
         jw.endArray();        
         // End source
         
@@ -145,5 +149,16 @@ public class SchemaRequestBuilder
         jw.close();        
 
         return wr.toString();        
+    }
+    
+    
+    private static void appendMatch(JsonWriter jw, String field, String value) throws IOException
+    {
+        jw.beginObject();
+        jw.name("match");
+        jw.beginObject();
+        jw.name(field).value(value);
+        jw.endObject();
+        jw.endObject();
     }
 }
