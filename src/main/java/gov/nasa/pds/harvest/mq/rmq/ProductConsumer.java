@@ -2,8 +2,6 @@ package gov.nasa.pds.harvest.mq.rmq;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -11,12 +9,8 @@ import org.apache.logging.log4j.Logger;
 import gov.nasa.pds.harvest.cfg.HarvestCfg;
 import gov.nasa.pds.harvest.cfg.RegistryCfg;
 import gov.nasa.pds.harvest.dao.DataLoader;
-import gov.nasa.pds.harvest.dao.RegistryManager;
 import gov.nasa.pds.harvest.dao.RegistryService;
-import gov.nasa.pds.harvest.dao.SchemaDao;
-import gov.nasa.pds.harvest.dao.Tuple;
-import gov.nasa.pds.harvest.dd.LddLoader;
-import gov.nasa.pds.harvest.dd.LddUtils;
+import gov.nasa.pds.harvest.dao.SchemaUpdater;
 import gov.nasa.pds.harvest.job.Job;
 import gov.nasa.pds.harvest.job.JobFactory;
 import gov.nasa.pds.harvest.mq.msg.ProductMessage;
@@ -38,8 +32,8 @@ public class ProductConsumer
     private RegistryDocWriter registryDocWriter;
     private ProductProcessor proc;
     private DataLoader dataLoader;
-    private LddLoader lddLoader;
-    
+    private SchemaUpdater schemaUpdater;
+
     
     /**
      * Constructor
@@ -57,8 +51,7 @@ public class ProductConsumer
         proc = new ProductProcessor(harvestCfg, registryDocWriter);
         
         dataLoader = new DataLoader(registryCfg.url, registryCfg.indexName, registryCfg.authFile);
-        lddLoader = new LddLoader(registryCfg.url, registryCfg.indexName, registryCfg.authFile);
-        lddLoader.loadPds2EsDataTypeMap(LddUtils.getPds2EsDataTypeCfgFile());
+        schemaUpdater = new SchemaUpdater(registryCfg);
     }
     
     
@@ -124,7 +117,7 @@ public class ProductConsumer
         {
             try
             {
-                updateSchema(registryDocWriter.getMissingFields(), registryDocWriter.getMissingXsds());
+                schemaUpdater.updateSchema(registryDocWriter.getMissingFields(), registryDocWriter.getMissingXsds());
             }
             catch(Exception ex)
             {
@@ -150,17 +143,4 @@ public class ProductConsumer
         return true;
     }
     
-
-    private void updateSchema(Set<String> fields, Map<String, String> xsds) throws Exception
-    {
-        log.info("Updating Elasticsearch schema.");
-        
-        SchemaDao dao = RegistryManager.getInstance().getSchemaDAO();
-        List<Tuple> newFields = dao.getDataTypes(fields);
-        if(newFields != null)
-        {
-            dao.updateSchema(newFields);
-            log.info("Updated " + newFields.size() + " fields");
-        }
-    }
 }

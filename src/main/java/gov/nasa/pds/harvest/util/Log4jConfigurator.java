@@ -1,7 +1,6 @@
 package gov.nasa.pds.harvest.util;
 
 import java.io.File;
-import java.util.UUID;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.appender.ConsoleAppender;
@@ -70,7 +69,7 @@ public class Log4jConfigurator
         {
             File dir = new File("/tmp/harvest");
             dir.mkdirs();
-            filePath = "/tmp/harvest/" + UUID.randomUUID().toString() + ".log";
+            filePath = "/tmp/harvest/harvest.log";
         }
         
         ComponentBuilder<?> policy = cfg.newComponent("Policies")
