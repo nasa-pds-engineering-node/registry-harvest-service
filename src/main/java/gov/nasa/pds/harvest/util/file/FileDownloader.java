@@ -3,19 +3,28 @@ package gov.nasa.pds.harvest.util.file;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.StatusLine;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.config.Registry;
+import org.apache.http.config.RegistryBuilder;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.socket.PlainConnectionSocketFactory;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
+import org.apache.http.ssl.SSLContexts;
+import org.apache.http.ssl.TrustStrategy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import gov.nasa.pds.harvest.util.CloseUtils;
-import gov.nasa.pds.registry.common.es.client.SSLUtils;
 
 /**
  * File downloader with retry logic. 
@@ -27,29 +36,23 @@ import gov.nasa.pds.registry.common.es.client.SSLUtils;
 public class FileDownloader
 {
     private Logger log;
-    private int timeout = 5000;
     private int numRetries = 3;
-    private boolean sslTrustAll = true;
     
+    private CloseableHttpClient httpClient;
+    
+
     /**
      * Constructor
+     * @param sslTrustAll Enable or disable SSL certificate and host validation 
+     * to support self-signed certificates.
+     * @throws Exception
      */
-    public FileDownloader()
+    public FileDownloader(boolean sslTrustAll) throws Exception
     {
         log = LogManager.getLogger(this.getClass());
+        httpClient = createHttpClient(sslTrustAll);
     }
 
-    
-    /**
-     * Enable or disable SSL certificate and host validation to support 
-     * self-signed certificates. By default, validation is disabled.
-     * @param val boolean flag.
-     */
-    public void setSslTrustAll(boolean val)
-    {
-        this.sslTrustAll = val;
-    }
-   
     
     /**
      * Download a file from a URL. Retry several times on error.
@@ -96,61 +99,61 @@ public class FileDownloader
     {
         InputStream is = null;
         FileOutputStream os = null;
+        CloseableHttpResponse resp = null;
         
         log.info("Downloading " + fromUrl + " to " + toFile.getAbsolutePath());
         
         try
         {
-            HttpURLConnection con = createConnection(new URL(fromUrl));
-            os = new FileOutputStream(toFile);
+            HttpGet httpGet = new HttpGet(fromUrl);
+            resp = httpClient.execute(httpGet);
+            StatusLine status = resp.getStatusLine();
             
-            is = con.getInputStream();
+            if(status.getStatusCode() != 200)
+            {
+                throw new Exception(status.getStatusCode()  + " - " + status.getReasonPhrase());
+            }
+            
+            HttpEntity entity = resp.getEntity();
+            is = entity.getContent();            
+            os = new FileOutputStream(toFile);            
             is.transferTo(os);
         }
         finally
         {
             CloseUtils.close(os);
             CloseUtils.close(is);
+            CloseUtils.close(resp);
         }
     }
 
 
-    /**
-     * Create HTTP or HTTPS connection
-     * @param url connect to this URL
-     * @return HTTP connection
-     * @throws Exception an exception
-     */
-    private HttpURLConnection createConnection(URL url) throws Exception
+    private CloseableHttpClient createHttpClient(boolean sslTrustAll) throws Exception
     {
-        HttpURLConnection con = (HttpURLConnection)url.openConnection();
-        if(con instanceof HttpsURLConnection)
+        if(sslTrustAll)
         {
-            HttpsURLConnection tlsCon = (HttpsURLConnection)con;
+            TrustStrategy acceptingTrustStrategy = (cert, authType) -> true;
+            SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy).build();
+            SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);
+            
+            RegistryBuilder<ConnectionSocketFactory> sfRegistryBld = RegistryBuilder.<ConnectionSocketFactory>create();
+            sfRegistryBld.register("https", sslsf);
+            sfRegistryBld.register("http", new PlainConnectionSocketFactory());
+            Registry<ConnectionSocketFactory> sfRegistry = sfRegistryBld.build();
 
-            if(sslTrustAll)
-            {
-                // Trust invalid / self-signed certificates
-                SSLContext sc = SSLUtils.createTrustAllContext();
-                tlsCon.setSSLSocketFactory(sc.getSocketFactory());
-
-                // Do not verify host name (CN=host)
-                tlsCon.setHostnameVerifier(new HostnameVerifier()
-                {
-                    @Override
-                    public boolean verify(String hostname, SSLSession session)
-                    {
-                        return true;
-                    }
-                });
-            }
+            BasicHttpClientConnectionManager connectionManager = new BasicHttpClientConnectionManager(sfRegistry);
+            
+            HttpClientBuilder clientBld = HttpClients.custom();
+            clientBld.setSSLSocketFactory(sslsf);
+            clientBld.setConnectionManager(connectionManager);
+            
+            CloseableHttpClient httpClient = clientBld.build();
+            return httpClient;
         }
-        
-        con.setConnectTimeout(timeout);
-        con.setReadTimeout(timeout);
-        con.setAllowUserInteraction(false);
-        
-        return con;
+        else
+        {
+            return HttpClients.createDefault();
+        }
     }
 
 }

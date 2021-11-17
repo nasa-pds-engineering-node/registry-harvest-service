@@ -1,6 +1,7 @@
 package gov.nasa.pds.harvest.dd;
 
 import java.io.File;
+import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -24,7 +25,6 @@ public class LddLoader
 {
     private Logger log;
 
-    private File tempDir;
     private Pds2EsDataTypeMap dtMap;
     private DataLoader loader;
     
@@ -39,7 +39,6 @@ public class LddLoader
     public LddLoader(String esUrl, String indexName, String authFilePath) throws Exception
     {
         log = LogManager.getLogger(this.getClass());
-        tempDir = new File(System.getProperty("java.io.tmpdir"));
         dtMap = new Pds2EsDataTypeMap();
         
         loader = new DataLoader(esUrl, indexName + "-dd", authFilePath);
@@ -59,46 +58,53 @@ public class LddLoader
     
     /**
      * Load PDS LDD JSON file into Elasticsearch data dictionary index
-     * @param ddFile PDS LDD JSON file
+     * @param lddFile PDS LDD JSON file
      * @param namespace Namespace filter. Only load classes having this namespace.
      * @throws Exception an exception
      */
-    public void load(File ddFile, String namespace) throws Exception
+    public void load(File lddFile, String lddFileName, String namespace, Instant lastDate) throws Exception
     {
-        File tempEsDataFile = new File(tempDir, "pds-registry-dd.tmp.json");
+        File tempEsDataFile = File.createTempFile("es-", ".json");
         log.info("Creating temporary ES data file " + tempEsDataFile.getAbsolutePath());
-        createEsDataFile(ddFile, namespace, tempEsDataFile);
 
-        // Load temporary file into data dictionary index
-        loader.loadFile(tempEsDataFile);
-        
-        // Delete temporary file
-        tempEsDataFile.delete();
+        try
+        {
+            createEsDataFile(lddFile, lddFileName, namespace, tempEsDataFile, lastDate);
+            loader.loadFile(tempEsDataFile);
+        }
+        finally
+        {
+            // Delete temporary file
+            tempEsDataFile.delete();
+        }
     }
 
     
     /**
      * Create Elasticsearch data file to be loaded into data dictionary index.
-     * @param ddFile PDS LDD JSON file
+     * @param lddFile PDS LDD JSON file
      * @param namespace Namespace filter. Only load classes having this namespace.
-     * @param esFile Write to this Elasticsearch file
+     * @param tempEsFile Write to this Elasticsearch file
      * @throws Exception an exception
      */
-    public void createEsDataFile(File ddFile, String namespace, File esFile) throws Exception
+    public void createEsDataFile(File lddFile, String lddFileName, String namespace, 
+            File tempEsFile, Instant lastDate) throws Exception
     {
         // Parse and cache LDD attributes
         Map<String, DDAttribute> ddAttrCache = new TreeMap<>();
-        AttributeDictionaryParser attrParser = new AttributeDictionaryParser(ddFile, 
+        AttributeDictionaryParser attrParser = new AttributeDictionaryParser(lddFile, 
                 (attr) -> { ddAttrCache.put(attr.id, attr); } );
         attrParser.parse();
-
+        
+        boolean overwrite = overwriteLdd(lastDate, attrParser.getLddDate());
+        
         // Create a writer to save LDD data in Elasticsearch JSON data file
-        LddEsJsonWriter writer = new LddEsJsonWriter(esFile, dtMap, ddAttrCache);
+        LddEsJsonWriter writer = new LddEsJsonWriter(tempEsFile, dtMap, ddAttrCache, overwrite);
         writer.setNamespaceFilter(namespace);
         
         // Parse class attribute associations and write to ES data file
         Set<String> namespaces = new TreeSet<>();
-        ClassAttrAssociationParser caaParser = new ClassAttrAssociationParser(ddFile, 
+        ClassAttrAssociationParser caaParser = new ClassAttrAssociationParser(lddFile, 
                 (classNs, className, attrId) -> { 
                     writer.writeFieldDefinition(classNs, className, attrId);
                     namespaces.add(classNs);
@@ -119,9 +125,24 @@ public class LddLoader
         }
         
         // Write data dictionary version and date
-        writer.writeDataDictionaryVersion(namespace, attrParser.getImVersion(), 
+        writer.writeLddInfo(namespace, lddFileName, attrParser.getImVersion(), 
                 attrParser.getLddVersion(), attrParser.getLddDate());
         
         writer.close();
+    }
+    
+    
+    private boolean overwriteLdd(Instant lastDate, String strLddDate)
+    {
+        try
+        {
+            Instant lddDate = LddUtils.lddDateToIsoInstant(strLddDate);
+            return lddDate.isAfter(lastDate);
+        }
+        catch(Exception ex)
+        {
+            log.warn("Could not parse LDD date " + strLddDate);
+            return false;
+        }
     }
 }

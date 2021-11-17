@@ -21,6 +21,7 @@ import com.google.gson.stream.JsonWriter;
 public abstract class BaseNJsonWriter<Record> implements Closeable
 {
     protected FileWriter writer;
+    private String action;
     
     
     /**
@@ -28,9 +29,10 @@ public abstract class BaseNJsonWriter<Record> implements Closeable
      * @param file output file
      * @throws Exception an exception
      */
-    public BaseNJsonWriter(File file) throws Exception
+    public BaseNJsonWriter(File file, boolean overwrite) throws Exception
     {
         writer = new FileWriter(file);
+        action = overwrite ? "index" : "create";
     }
     
 
@@ -101,7 +103,7 @@ public abstract class BaseNJsonWriter<Record> implements Closeable
         
         jw.beginObject();
         
-        jw.name("index");
+        jw.name(action);
         jw.beginObject();
         jw.name("_id").value(id);
         jw.endObject();

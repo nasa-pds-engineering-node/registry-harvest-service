@@ -50,7 +50,7 @@ public class DataLoader
     public DataLoader(String esUrl, String esIndex, String esAuthFile) throws Exception
     {
         log = LogManager.getLogger(this.getClass());
-        conFactory = new HttpConnectionFactory(esUrl, esIndex, "_bulk");
+        conFactory = new HttpConnectionFactory(esUrl, esIndex, "_bulk?refresh=wait_for");
         conFactory.initAuth(esAuthFile);
     }
     

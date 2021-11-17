@@ -3,6 +3,7 @@ package gov.nasa.pds.harvest.dd;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Locale;
@@ -44,10 +45,24 @@ public class LddUtils
      * @return ISO Instant formatted date
      * @throws Exception an exception
      */
-    public static String lddDateToIsoInstant(String lddDate) throws Exception
+    public static String lddDateToIsoInstantString(String lddDate) throws Exception
     {
         Date dt = LDD_DateFormat.parse(lddDate);
         return DateTimeFormatter.ISO_INSTANT.format(dt.toInstant());
     }
+
     
+    /**
+     * Convert LDD date, e.g., "Wed Dec 23 10:16:28 EST 2020" 
+     * to ISO Instant format, e.g., "2020-12-23T15:16:28Z".
+     * @param lddDate LDD date from PDS LDD JSON file.
+     * @return ISO Instant formatted date
+     * @throws Exception an exception
+     */
+    public static Instant lddDateToIsoInstant(String lddDate) throws Exception
+    {
+        Date dt = LDD_DateFormat.parse(lddDate);
+        return dt.toInstant();
+    }
+
 }

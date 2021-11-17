@@ -11,12 +11,12 @@ import org.apache.logging.log4j.Logger;
 import gov.nasa.pds.harvest.cfg.RegistryCfg;
 import gov.nasa.pds.harvest.dd.LddLoader;
 import gov.nasa.pds.harvest.dd.LddUtils;
+import gov.nasa.pds.harvest.util.ExceptionUtils;
 import gov.nasa.pds.harvest.util.file.FileDownloader;
 
 /**
  * Update Elasticsearch schema and LDDs
  * @author karpenko
- *
  */
 public class SchemaUpdater
 {
@@ -32,13 +32,19 @@ public class SchemaUpdater
     public SchemaUpdater(RegistryCfg cfg) throws Exception
     {
         log = LogManager.getLogger(this.getClass());
-        fileDownloader = new FileDownloader();
+        fileDownloader = new FileDownloader(true);
         
         lddLoader = new LddLoader(cfg.url, cfg.indexName, cfg.authFile);
         lddLoader.loadPds2EsDataTypeMap(LddUtils.getPds2EsDataTypeCfgFile());
     }
     
     
+    /**
+     * Update Elasticsearch schema
+     * @param fields fields to add
+     * @param xsds XSDs of fields to add
+     * @throws Exception an exception
+     */
     public void updateSchema(Set<String> fields, Map<String, String> xsds) throws Exception
     {
         SchemaDao dao = RegistryManager.getInstance().getSchemaDAO();
@@ -95,24 +101,26 @@ public class SchemaUpdater
         try
         {
             fileDownloader.download(jsonUrl, lddFile);
+            lddLoader.load(lddFile, schemaFileName, prefix, lddInfo.lastDate);
         }
         catch(Exception ex)
         {
+            log.error(ExceptionUtils.getMessage(ex));
             if(lddInfo.isEmpty())
             {
                 log.warn("Will use 'keyword' data type.");
+                return;
             }
             else
             {
                 log.warn("Will use field definitions from " + lddInfo.files);
+                return;
             }
         }
         finally
         {
             lddFile.delete();
         }
-
-
     }
     
     

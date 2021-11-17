@@ -32,10 +32,11 @@ public class LddEsJsonWriter
      * @param ddAttrCache LDD attribute cache
      * @throws Exception an exception
      */
-    public LddEsJsonWriter(File outFile, Pds2EsDataTypeMap dtMap, Map<String, DDAttribute> ddAttrCache) throws Exception
+    public LddEsJsonWriter(File outFile, Pds2EsDataTypeMap dtMap, Map<String, 
+            DDAttribute> ddAttrCache, boolean overwrite) throws Exception
     {
         log = LogManager.getLogger(this.getClass());
-        writer = new DDNJsonWriter(outFile);
+        writer = new DDNJsonWriter(outFile, overwrite);
         this.dtMap = dtMap;
         this.ddAttrCache = ddAttrCache;
     }
@@ -92,8 +93,8 @@ public class LddEsJsonWriter
      * @param date LDD date
      * @throws Exception an exception
      */
-    public void writeDataDictionaryVersion(String namespace, String imVersion, 
-            String lddVersion, String date) throws Exception
+    public void writeLddInfo(String namespace, String schemaFileName, 
+            String imVersion, String lddVersion, String date) throws Exception
     {
         if(namespace == null || namespace.isBlank()) throw new IllegalArgumentException("Missing data dictionary namespace");
         if(date == null || date.isBlank()) throw new IllegalArgumentException("Missing data dictionary date");
@@ -101,12 +102,12 @@ public class LddEsJsonWriter
         DDRecord rec = new DDRecord();
         rec.classNs = "registry";
         rec.className = "LDD_Info";
-        rec.attrNs = "registry";
-        rec.attrName = namespace;
+        rec.attrNs = namespace;
+        rec.attrName = schemaFileName;
         
         rec.imVersion = imVersion;
         rec.lddVersion = lddVersion;
-        rec.date = LddUtils.lddDateToIsoInstant(date);
+        rec.date = LddUtils.lddDateToIsoInstantString(date);
         
         writer.write(rec.esFieldNameFromComponents(), rec);
     }
