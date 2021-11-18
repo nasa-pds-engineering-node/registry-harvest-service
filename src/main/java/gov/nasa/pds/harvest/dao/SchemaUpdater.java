@@ -47,41 +47,59 @@ public class SchemaUpdater
      */
     public void updateSchema(Set<String> fields, Map<String, String> xsds) throws Exception
     {
-        SchemaDao dao = RegistryManager.getInstance().getSchemaDAO();
-
-        log.info("Updating LDDs.");
-        for(Map.Entry<String, String> xsd: xsds.entrySet())
+        // Update LDDs
+        if(xsds != null && !xsds.isEmpty()) 
         {
-            String uri = xsd.getKey();
-            String prefix = xsd.getValue();
-            
-            updateLdd(uri, prefix);
+            log.info("Updating LDDs.");
+
+            for(Map.Entry<String, String> xsd: xsds.entrySet())
+            {
+                String uri = xsd.getKey();
+                String prefix = xsd.getValue();
+                
+                try
+                {
+                    updateLdd(uri, prefix);
+                }
+                catch(Exception ex)
+                {
+                    log.error("Could not update LDD. " + ExceptionUtils.getMessage(ex));
+                }
+            }
         }
         
-        log.info("Updating Elasticsearch schema.");
-        
-        List<Tuple> newFields = dao.getDataTypes(fields);
-        if(newFields != null)
+        // Update schema
+        if(fields != null && !fields.isEmpty())
         {
-            dao.updateSchema(newFields);
-            log.info("Updated " + newFields.size() + " fields");
+            log.info("Updating Elasticsearch schema.");
+
+            SchemaDao dao = RegistryManager.getInstance().getSchemaDAO();
+            List<Tuple> newFields = dao.getDataTypes(fields);
+            if(newFields != null)
+            {
+                dao.updateSchema(newFields);
+                log.info("Updated " + newFields.size() + " fields");
+            }
         }
     }
 
-    
+
     private void updateLdd(String uri, String prefix) throws Exception
     {
         if(uri == null || uri.isEmpty()) return;
         if(prefix == null || prefix.isEmpty()) return;
 
-        log.info("Updating '" + prefix  + "' LDD from " + uri);
+        log.info("Updating '" + prefix  + "' LDD. Schema location: " + uri);
         
         // Get JSON schema URL from XSD URL
         String jsonUrl = getJsonUrl(uri);
 
         // Get schema file name
         int idx = jsonUrl.lastIndexOf('/');
-        if(idx < 0) throw new Exception("Invalid schema URI." + uri);
+        if(idx < 0) 
+        {
+            throw new Exception("Invalid schema URI." + uri);
+        }
         String schemaFileName = jsonUrl.substring(idx+1);
         
         // Get stored LDDs info

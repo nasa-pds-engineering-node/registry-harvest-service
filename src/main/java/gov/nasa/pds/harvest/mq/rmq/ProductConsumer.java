@@ -11,6 +11,7 @@ import gov.nasa.pds.harvest.cfg.RegistryCfg;
 import gov.nasa.pds.harvest.dao.DataLoader;
 import gov.nasa.pds.harvest.dao.RegistryService;
 import gov.nasa.pds.harvest.dao.SchemaUpdater;
+import gov.nasa.pds.harvest.dao.SchemaUtils;
 import gov.nasa.pds.harvest.job.Job;
 import gov.nasa.pds.harvest.job.JobFactory;
 import gov.nasa.pds.harvest.mq.msg.ProductMessage;
@@ -117,13 +118,22 @@ public class ProductConsumer
         {
             try
             {
+                // Update schema
                 schemaUpdater.updateSchema(registryDocWriter.getMissingFields(), registryDocWriter.getMissingXsds());
+                // Update cache
+                SchemaUtils.updateFieldsCache();
             }
             catch(Exception ex)
             {
                 log.error("Could not update Elasticsearch schema. " + ExceptionUtils.getMessage(ex));
-                // TODO: Fix 
+
                 // Ignore the whole batch for now
+                log.error("Following files will not be processed:");
+                for(String file: filesToProcess)
+                {
+                    log.error(file);
+                }
+                
                 return true;
             }
         }
