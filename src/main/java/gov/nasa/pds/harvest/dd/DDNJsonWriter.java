@@ -21,7 +21,7 @@ public class DDNJsonWriter extends BaseNJsonWriter<DDRecord>
      */
     public DDNJsonWriter(File file, boolean overwrite) throws Exception
     {
-        super(file, overwrite);
+        super(file, overwrite ? "index" : "create");
     }
 
     

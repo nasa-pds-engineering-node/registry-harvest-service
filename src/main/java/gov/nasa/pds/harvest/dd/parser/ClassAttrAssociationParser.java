@@ -159,14 +159,20 @@ public class ClassAttrAssociationParser extends BaseLddParser
     
     private void parseAssoc() throws Exception
     {
+        String identifier = null;
         boolean isAttribute = false;
+        boolean hasAttributeId = false;
         
         jsonReader.beginObject();
         
         while(jsonReader.hasNext() && jsonReader.peek() != JsonToken.END_OBJECT)
         {
             String name = jsonReader.nextName();
-            if("isAttribute".equals(name))
+            if("identifier".equals(name))
+            {
+                identifier = jsonReader.nextString();
+            }
+            else if("isAttribute".equals(name))
             {
                 String val = jsonReader.nextString();
                 if("true".equals(val))
@@ -176,12 +182,19 @@ public class ClassAttrAssociationParser extends BaseLddParser
             }
             else if("attributeId".equals(name) && isAttribute)
             {
+                hasAttributeId = true;
                 parseAttributeIds();
             }
             else
             {
                 jsonReader.skipValue();
             }
+        }
+        
+        // Old versions of LDD didn't have "attributeId" field.
+        if(isAttribute && hasAttributeId == false && identifier != null)
+        {
+            cb.onAssociation(classNs, className, identifier);
         }
         
         jsonReader.endObject();

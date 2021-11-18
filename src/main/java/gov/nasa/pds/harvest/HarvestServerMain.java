@@ -123,7 +123,7 @@ public class HarvestServerMain
         System.out.println();
         System.out.println("Optional parameters:");
         System.out.println("  -l <file>    Log file. Default is /tmp/harvest/harvest.log");
-        System.out.println("  -v <level>   Logger verbosity: DEBUG, INFO (default), WARN, ERROR");        
+        System.out.println("  -v <level>   Logger verbosity: DEBUG / ALL, INFO (default), WARN, ERROR");        
     }
 
     

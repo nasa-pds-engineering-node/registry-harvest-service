@@ -97,6 +97,7 @@ public class Log4jConfigurator
         switch(verbosity.toUpperCase())
         {
         case "ALL": return Level.ALL;
+        case "DEBUG": return Level.ALL;
         case "INFO": return Level.INFO;
         case "WARN": return Level.WARN;
         case "ERROR": return Level.ERROR;

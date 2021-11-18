@@ -63,7 +63,7 @@ public class SchemaUpdater
         List<Tuple> newFields = dao.getDataTypes(fields);
         if(newFields != null)
         {
-            //dao.updateSchema(newFields);
+            dao.updateSchema(newFields);
             log.info("Updated " + newFields.size() + " fields");
         }
     }

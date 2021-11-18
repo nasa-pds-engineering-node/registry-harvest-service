@@ -109,7 +109,8 @@ public class LddEsJsonWriter
         rec.lddVersion = lddVersion;
         rec.date = LddUtils.lddDateToIsoInstantString(date);
         
-        writer.write(rec.esFieldNameFromComponents(), rec);
+        // Overwrite existing record
+        writer.write(rec.esFieldNameFromComponents(), rec, "index");
     }
     
     

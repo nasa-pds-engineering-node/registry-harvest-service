@@ -21,7 +21,7 @@ import com.google.gson.stream.JsonWriter;
 public abstract class BaseNJsonWriter<Record> implements Closeable
 {
     protected FileWriter writer;
-    private String action;
+    protected String action;
     
     
     /**
@@ -29,10 +29,10 @@ public abstract class BaseNJsonWriter<Record> implements Closeable
      * @param file output file
      * @throws Exception an exception
      */
-    public BaseNJsonWriter(File file, boolean overwrite) throws Exception
+    public BaseNJsonWriter(File file, String action) throws Exception
     {
         writer = new FileWriter(file);
-        action = overwrite ? "index" : "create";
+        this.action = action;
     }
     
 
@@ -54,7 +54,7 @@ public abstract class BaseNJsonWriter<Record> implements Closeable
         writer.close();
     }
     
-    
+
     /**
      * Write a primary key and a data record.
      * @param pk primary key
@@ -63,8 +63,21 @@ public abstract class BaseNJsonWriter<Record> implements Closeable
      */
     public void write(String pk, Record data) throws Exception
     {
+        write(pk, data, this.action);
+    }
+    
+    
+    /**
+     * Write a primary key and a data record.
+     * @param pk primary key
+     * @param data data record
+     * @param action "index" / "create"
+     * @throws Exception an exception
+     */
+    public void write(String pk, Record data, String action) throws Exception
+    {
         // First line: primary key 
-        writePK(pk);
+        writePK(pk, action);
         newLine();
         
         // Second line: data record
@@ -92,9 +105,10 @@ public abstract class BaseNJsonWriter<Record> implements Closeable
     /**
      * Write primary key
      * @param id primary key
+     * @param action "index" / "create"
      * @throws Exception an exception
      */
-    protected void writePK(String id) throws Exception
+    protected void writePK(String id, String action) throws Exception
     {
         if(id == null) throw new Exception("Primary key is null");
         

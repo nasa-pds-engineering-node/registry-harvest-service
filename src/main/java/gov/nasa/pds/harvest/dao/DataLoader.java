@@ -32,7 +32,7 @@ import gov.nasa.pds.registry.common.es.client.HttpConnectionFactory;
  */
 public class DataLoader
 {
-    private int printProgressSize = 5000;
+    private int printProgressSize = 500;
     private int batchSize = 100;
     private int totalRecords;
     
@@ -60,9 +60,9 @@ public class DataLoader
      * @param data NJSON data. (2 lines per record)
      * @throws Exception an exception
      */
-    public void loadBatch(List<String> data) throws Exception
+    public int loadBatch(List<String> data) throws Exception
     {
-        if(data == null || data.isEmpty()) return;
+        if(data == null || data.isEmpty()) return 0;
         if(data.size() % 2 != 0) throw new Exception("Data list size should be an even number.");
         
         HttpURLConnection con = null;
@@ -92,10 +92,10 @@ public class DataLoader
             String respJson = getLastLine(con.getInputStream());
             log.debug(respJson);
             
-            if(responseHasErrors(respJson))
-            {
-                throw new Exception("Could not load data.");
-            }
+            int numErrors = processErrors(respJson);
+            // Return number of successfully saved records
+            // NOTE: data list has two lines per record (primary key + data)
+            return data.size() / 2 - numErrors;
         }
         catch(UnknownHostException ex)
         {
@@ -162,7 +162,7 @@ public class DataLoader
             
             while((firstLine = loadBatch(rd, firstLine)) != null)
             {
-                if(totalRecords % printProgressSize == 0)
+                if(totalRecords != 0 && (totalRecords % printProgressSize) == 0)
                 {
                     log.info("Loaded " + totalRecords + " document(s)");
                 }
@@ -240,12 +240,8 @@ public class DataLoader
             String respJson = getLastLine(con.getInputStream());
             log.debug(respJson);
             
-            if(responseHasErrors(respJson))
-            {
-                throw new Exception("Could not load data.");
-            }
-            
-            totalRecords += numRecords;
+            int numErrors = processErrors(respJson);
+            totalRecords += (numRecords - numErrors);
 
             return line1;
         }
@@ -273,39 +269,64 @@ public class DataLoader
 
     
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    private boolean responseHasErrors(String resp)
+    private int processErrors(String resp)
     {
+        int numErrors = 0;
+
         try
         {
+            // TODO: Use streaming parser. Stop parsing if there are no errors.
             // Parse JSON response
             Gson gson = new Gson();
             Map json = (Map)gson.fromJson(resp, Object.class);
             
             Boolean hasErrors = (Boolean)json.get("errors");
             if(hasErrors)
-            {
+            {                
                 List<Object> list = (List)json.get("items");
-                
+             
                 // List size = batch size (one item per document)
-                // NOTE: Only few items in the list could have errors
                 for(Object item: list)
                 {
-                    Map index = (Map)((Map)item).get("index");
-                    Map error = (Map)index.get("error");
+                    Map action = (Map)((Map)item).get("index");
+                    if(action == null)
+                    {
+                        action = (Map)((Map)item).get("create");
+                        if(action != null)
+                        {
+                            String status = String.valueOf(action.get("status"));
+                            // For "create" requests status=409 means that the record already exists.
+                            // It is not an error. We use "create" action to insert records which don't exist
+                            // and keep existing records as is. We do this when loading an old LDD and more
+                            // recent version of the LDD is already loaded.
+                            // NOTE: Gson JSON parser stores numbers as floats. 
+                            // The string value is usually "409.0". Can it be something else?
+                            if(status.startsWith("409")) 
+                            {
+                                // Increment to properly report number of processed records.
+                                numErrors++;
+                                continue;
+                            }
+                        }
+                    }
+                    if(action == null) continue;
+                    
+                    String id = (String)action.get("_id");
+                    Map error = (Map)action.get("error");
                     if(error != null)
                     {
                         String message = (String)error.get("reason");
-                        log.error(message);
-                        return true;
+                        log.error("LIDVID = " + id + ", Message = " + message);
+                        numErrors++;
                     }
                 }
             }
 
-            return false;
+            return numErrors;
         }
         catch(Exception ex)
         {
-            return false;
+            return 0;
         }
     }
     

@@ -21,7 +21,7 @@ public class TestProductConsumer
         try
         {
             Configuration cfg = createConfiguration();
-            Log4jConfigurator.configure("INFO", "/tmp/t.log");
+            Log4jConfigurator.configure("DEBUG", "/tmp/t.log");
             initRegistry(cfg.registryCfg);
             
             ProductConsumer consumer = new ProductConsumer(cfg.harvestCfg, cfg.registryCfg);
@@ -67,7 +67,8 @@ public class TestProductConsumer
         msg.jobId = "TestJob123";
         msg.nodeName = "TestNode";
         msg.overwrite = true;
-        msg.files = Arrays.asList("/tmp/d5/orex.xml");
+        msg.files = Arrays.asList("/tmp/d4/orex-error.xml");
+        //msg.files = Arrays.asList("/tmp/d1/1294638283.xml");
         msg.lidvids = Arrays.asList("lidvid:test:1234::1.0");
         
         return msg;

@@ -131,8 +131,10 @@ public class ProductConsumer
         // Load the data into Elasticsearch
         try
         {
+            log.info("Loading data.");
             List<String> data = registryDocWriter.getData();
-            dataLoader.loadBatch(data);
+            int numRecords = dataLoader.loadBatch(data);
+            log.info("Loaded " + numRecords + " products.");
         }
         catch(Exception ex)
         {
