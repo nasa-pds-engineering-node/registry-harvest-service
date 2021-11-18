@@ -40,15 +40,29 @@ public class ConfigurationReader
     private static final String PROP_ES_INDEX = "es.index";
     private static final String PROP_ES_AUTH = "es.authFile";
     
+    // Harvest
+    private static final String PROP_HARVEST_STORE_LABELS = "harvest.storeLabels";
+    private static final String PROP_HARVEST_STORE_JSON_LABELS = "harvest.storeJsonLabels";
+    private static final String PROP_HARVEST_PROCESS_DATA_FILES = "harvest.processDataFiles";
+        
     private Logger log;
 
     
+    /**
+     * Constructor
+     */
     public ConfigurationReader()
     {
         log = LogManager.getLogger(this.getClass());
     }
 
-
+    
+    /**
+     * Read Harvest configuration file
+     * @param file Harvest server configuration file
+     * @return configuration object
+     * @throws Exception an exception
+     */
     public Configuration read(File file) throws Exception
     {
         Configuration cfg = parseConfigFile(file);
@@ -57,7 +71,11 @@ public class ConfigurationReader
         return cfg;
     }
     
-    
+    /**
+     * Validate configuration
+     * @param cfg configuration object
+     * @throws Exception an exception
+     */
     private void validate(Configuration cfg) throws Exception
     {
         // Validate Message queue / server
@@ -206,6 +224,17 @@ public class ConfigurationReader
                     cfg.registryCfg.authFile = value;
                     break;
                     
+                // Harvest
+                case PROP_HARVEST_PROCESS_DATA_FILES:
+                    cfg.harvestCfg.processDataFiles = parseBoolean(PROP_HARVEST_PROCESS_DATA_FILES, value, true);
+                    break;
+                case PROP_HARVEST_STORE_JSON_LABELS:
+                    cfg.harvestCfg.storeJsonLabels = parseBoolean(PROP_HARVEST_STORE_JSON_LABELS, value, true);
+                    break;
+                case PROP_HARVEST_STORE_LABELS:
+                    cfg.harvestCfg.storeLabels = parseBoolean(PROP_HARVEST_STORE_LABELS, value, true);
+                    break;
+
                 default:
                     throw new Exception("Invalid property '" + key + "'");
                 }
@@ -268,5 +297,16 @@ public class ConfigurationReader
         }
             
         return new IPAddress(host, port);
+    }
+    
+    
+    private boolean parseBoolean(String property, String value, boolean defaultValue)
+    {
+        if(value == null) return defaultValue;
+        if(value.equalsIgnoreCase("true") || value.equalsIgnoreCase("yes")) return true;
+        if(value.equalsIgnoreCase("false") || value.equalsIgnoreCase("no")) return false;
+        
+        log.warn("Property '" + property + "' has invalid boolean value '" + value + "'. Will use " + defaultValue);
+        return defaultValue;
     }
 }
