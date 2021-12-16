@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Copyright Â© 2021, California Institute of Technology ("Caltech").
+Copyright © 2021, California Institute of Technology ("Caltech").
 U.S. Government sponsorship acknowledged.
 
 All rights reserved.
@@ -8,12 +8,12 @@ All rights reserved.
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
-â€¢ Redistributions of source code must retain the above copyright notice,
+• Redistributions of source code must retain the above copyright notice,
   this list of conditions and the following disclaimer.
-â€¢ Redistributions must reproduce the above copyright notice, this list of
+• Redistributions must reproduce the above copyright notice, this list of
   conditions and the following disclaimer in the documentation and/or other
   materials provided with the distribution.
-â€¢ Neither the name of Caltech nor its operating division, the Jet Propulsion
+• Neither the name of Caltech nor its operating division, the Jet Propulsion
   Laboratory, nor the names of its contributors may be used to endorse or
   promote products derived from this software without specific prior written
   permission.
@@ -33,36 +33,12 @@ POSSIBILITY OF SUCH DAMAGE.
 
 <document>
 <properties>
-  <title>Scalable Harvest</title>
+  <title>Operation</title>
 </properties>
 
 <body>
 
-<section name="About Scalable Harvest">
-<p>
-Scalable Harvest is a distributed application for crawling and loading PDS4 product metadata into PDS Registry.
-It is based on microservices and messaging architecture shown below.
-</p>
-<img src="images/bd-harvest-arch.png" style="width:55em;" />
-
-<subsection name="Main Components">
-<ul>
-
-<li><b>Message broker</b> - enables services and applications to communicate with each other using messages. 
-Currently we utilize <a href="https://www.rabbitmq.com/" target="_blank">RabbitMQ</a>, one of the most popular open source message brokers.
-</li>
-
-<li><b>Harvest client</b> - submits new jobs to the "job" message queue. 
-Harvest client's command-line interface and configuration is very similar to existing standalone Harvest.
-</li>
-
-<li><b>Crawler server</b> - </li>
-
-<li><b>Harvest server</b> - </li>
-
-</ul>
-</subsection>
-
+<section name="Operation">
 </section>
 
 </body>

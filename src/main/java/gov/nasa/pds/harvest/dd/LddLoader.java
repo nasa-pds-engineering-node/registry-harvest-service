@@ -3,9 +3,7 @@ package gov.nasa.pds.harvest.dd;
 import java.io.File;
 import java.time.Instant;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -80,6 +78,23 @@ public class LddLoader
     }
 
     
+    private static class CaaCallback implements ClassAttrAssociationParser.Callback
+    {
+        private LddEsJsonWriter writer;
+        
+        public CaaCallback(LddEsJsonWriter writer)
+        {
+            this.writer = writer;
+        }
+
+        @Override
+        public void onAssociation(String classNs, String className, String attrId) throws Exception
+        {
+            writer.writeFieldDefinition(classNs, className, attrId);
+        }
+    }
+
+    
     /**
      * Create Elasticsearch data file to be loaded into data dictionary index.
      * @param lddFile PDS LDD JSON file
@@ -87,48 +102,38 @@ public class LddLoader
      * @param tempEsFile Write to this Elasticsearch file
      * @throws Exception an exception
      */
-    public void createEsDataFile(File lddFile, String lddFileName, String namespace, 
+    private void createEsDataFile(File lddFile, String lddFileName, String namespace, 
             File tempEsFile, Instant lastDate) throws Exception
     {
         // Parse and cache LDD attributes
         Map<String, DDAttribute> ddAttrCache = new TreeMap<>();
-        AttributeDictionaryParser attrParser = new AttributeDictionaryParser(lddFile, 
-                (attr) -> { ddAttrCache.put(attr.id, attr); } );
+        AttributeDictionaryParser.Callback acb = (attr) -> { ddAttrCache.put(attr.id, attr); }; 
+        AttributeDictionaryParser attrParser = new AttributeDictionaryParser(lddFile, acb);
         attrParser.parse();
         
+        // If this LDD date is after the last stored in Elasticsearch, overwrite old records
         boolean overwrite = overwriteLdd(lastDate, attrParser.getLddDate());
         
         // Create a writer to save LDD data in Elasticsearch JSON data file
-        LddEsJsonWriter writer = new LddEsJsonWriter(tempEsFile, dtMap, ddAttrCache, overwrite);
-        writer.setNamespaceFilter(namespace);
-        
-        // Parse class attribute associations and write to ES data file
-        Set<String> namespaces = new TreeSet<>();
-        ClassAttrAssociationParser caaParser = new ClassAttrAssociationParser(lddFile, 
-                (classNs, className, attrId) -> { 
-                    writer.writeFieldDefinition(classNs, className, attrId);
-                    namespaces.add(classNs);
-        });
-        caaParser.parse();
-
-        // Determine LDD namespace
-        if(namespace == null)
+        LddEsJsonWriter writer = null; 
+        try
         {
-            if(namespaces.size() == 1)
-            {
-                namespace = namespaces.iterator().next();
-            }
-            else
-            {
-                throw new Exception("Data dictionary has multiple namespaces. Specify one namespace to use.");
-            }
+            writer = new LddEsJsonWriter(tempEsFile, dtMap, ddAttrCache, overwrite);
+            writer.setNamespaceFilter(namespace);
+            
+            // Parse class attribute associations and write to ES data file
+            CaaCallback ccb = new CaaCallback(writer);
+            ClassAttrAssociationParser caaParser = new ClassAttrAssociationParser(lddFile, ccb); 
+            caaParser.parse();
+    
+            // Write data dictionary version and date
+            writer.writeLddInfo(namespace, lddFileName, attrParser.getImVersion(), 
+                    attrParser.getLddVersion(), attrParser.getLddDate());
         }
-        
-        // Write data dictionary version and date
-        writer.writeLddInfo(namespace, lddFileName, attrParser.getImVersion(), 
-                attrParser.getLddVersion(), attrParser.getLddDate());
-        
-        writer.close();
+        finally
+        {
+            writer.close();
+        }
     }
     
     

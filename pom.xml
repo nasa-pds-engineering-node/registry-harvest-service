@@ -233,8 +233,8 @@ Go through this file line-by-line and replace the template values with your own.
             <plugin>
                 <artifactId>maven-site-plugin</artifactId>
                 <configuration>
-                    <skip>true</skip>
-                    <skipDeploy>true</skipDeploy>
+                    <skip>false</skip>
+                    <skipDeploy>false</skipDeploy>
                 </configuration>
             </plugin>
             <!-- Java Docs -->
@@ -253,7 +253,7 @@ Go through this file line-by-line and replace the template values with your own.
     <developers/>
     <profiles/>
     <distributionManagement/>
-    <reporting/>
+
     <licenses/>
     <organization/>  <!-- ← Might not be implemented in parent pom yet -->
 

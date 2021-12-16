@@ -4,8 +4,16 @@ import java.util.Set;
 
 import gov.nasa.pds.harvest.meta.FieldNameCache;
 
+/**
+ * Utility methods to work with elasticsearch schema
+ * @author karpenko
+ */
 public class SchemaUtils
 {
+    /**
+     * Update fields cache of Elasticsearch registry index.
+     * @throws Exception
+     */
     public static void updateFieldsCache() throws Exception
     {
         SchemaDao schemaDao = RegistryManager.getInstance().getSchemaDAO();
