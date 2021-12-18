@@ -40,8 +40,9 @@ POSSIBILITY OF SUCH DAMAGE.
 
 <section name="About Scalable Harvest">
 <p>
-Scalable Harvest is a distributed application for crawling and loading PDS4 product metadata into PDS Registry.
-It is based on microservices and messaging architecture shown below.
+Scalable Harvest is a distributed application for crawling filesystem, extracting PDS4 product metadata 
+and loading it into PDS Registry (Elasticsearch).
+The application is based on microservices and messaging architecture shown below.
 </p>
 <img src="images/bd-harvest-arch.png" style="width:55em;" />
 
@@ -56,9 +57,15 @@ Currently we utilize <a href="https://www.rabbitmq.com/" target="_blank">RabbitM
 Harvest client's command-line interface and configuration is very similar to existing standalone Harvest.
 </li>
 
-<li><b>Crawler server</b> - </li>
+<li><b>Crawler server</b> - one or more crawler servers process messages from the "job" queue. 
+Each server crawls directories listed in job messages. Paths of PDS4 label files are combined into batches
+and published to the "file" queue. "Directory" queue is used to process sub-folders.
+</li>
 
-<li><b>Harvest server</b> - </li>
+<li><b>Harvest server</b> - one or more harvest servers process messages from the "file" queue. 
+Each server extracts metadata from PDS4 labels listed in the message and stores extracted information
+in the Registry (Elasticsearch).
+</li>
 
 </ul>
 </subsection>

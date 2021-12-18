@@ -33,25 +33,13 @@ POSSIBILITY OF SUCH DAMAGE.
 
 <document>
 <properties>
-  <title>Installation</title>
+  <title>Crawler Server Installation</title>
 </properties>
 
 <body>
 
-<section name="Installation">
-<p>This document describes installation and configuration of the following components:</p>
-
-<h4>Server Components</h4>
-<ul>
-<li><a href="rabbit.html">RabbitMQ Message Broker</a></li>
-<li><a href="crawler.html">Crawler Server</a></li>
-<li><a href="harvest.html">Harvest Server</a></li>
-</ul>
-
-<h4>Client Components</h4>
-<ul>
-<li><a href="harvest-client.html">Harvest Client</a></li>
-</ul>
+<section name="Crawler Server Installation and Configuration">
+<p>This document describes installation and configuration of Crawler Server.</p>
 
 </section>
 

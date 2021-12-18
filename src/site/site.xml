@@ -58,7 +58,12 @@ POSSIBILITY OF SUCH DAMAGE.
 
         <menu name='Documentation'>
             <item name='About Scalable Harvest' href='index.html'/>
-            <item name='Installation' href='install/index.html'/>
+            <item name='Installation' href='install/index.html'>
+                <item name="RabbitMQ" href="install/rabbit.html"/>
+                <item name="Crawler Server" href="install/crawler.html"/>
+                <item name="Harvest Server" href="install/harvest.html"/>
+                <item name="Harvest Client" href="install/harvest-client.html"/>
+            </item>
             <item name='Operation' href='operate/index.html'/>
             <!--
             <item name='What to do if it start smoking' href='explosion/index.html'/>
