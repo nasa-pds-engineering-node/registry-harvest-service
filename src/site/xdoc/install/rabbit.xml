@@ -41,6 +41,68 @@ POSSIBILITY OF SUCH DAMAGE.
 <section name="RabbitMQ Installation and Configuration">
 <p>This document describes installation and configuration of RabbitMQ Message Broker.</p>
 
+<subsection name="Docker Quick Start">
+
+<h4>Create and Start Container</h4>
+
+<p>To pull RabbitMQ docker image from DockerHub run the following command:</p>
+<source>
+docker pull rabbitmq:3.9-management
+</source>
+
+<p>Create RabbitMQ docker container:</p>
+<source>
+docker create --name rabbit --hostname rabbit -p 15672:15672 -p 5672:5672 rabbitmq:3.9-management
+</source>
+</subsection>
+
+<p>Start RabbitMQ container:</p>
+<source>
+docker start rabbit
+</source>
+
+<p>Check that RabbitMQ is running:</p>
+<source>
+curl -u guest:guest http://localhost:15672/api/cluster-name
+</source>
+<p>You should get following response:</p>
+<source>
+{"name":"rabbit@rabbit"}
+</source>
+
+<h4>Create Harvest User</h4>
+
+<p>To run commands in RabbitMQ container, execute an interactive bash shell in the container:</p>
+<source>
+docker exec -it rabbit bash
+</source>
+
+<p>Now we can create "harvest" user. In this example we will make "harvest" user an administrator.</p>
+<source>
+rabbitmqctl add_user harvest harvest
+rabbitmqctl set_user_tags harvest administrator
+rabbitmqctl set_permissions -p / harvest ".*" ".*" ".*"
+</source>
+
+<p>
+Optionally change password for "guest" user:
+</p>
+<source>
+rabbitmqctl change_password guest guest1234
+</source>
+<p>Or completely delete "guest" user:</p>
+<source>
+rabbitmqctl delete_user guest
+</source>
+
+<h4>References</h4>
+<ul>
+<li><a href="https://rawcdn.githack.com/rabbitmq/rabbitmq-server/v3.9.11/deps/rabbitmq_management/priv/www/api/index.html"
+target="_blank">RabbitMQ Management REST API</a></li>
+</ul>
+
+
+
 </section>
 
 </body>
