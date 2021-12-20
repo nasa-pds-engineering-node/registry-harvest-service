@@ -41,7 +41,19 @@ POSSIBILITY OF SUCH DAMAGE.
 <section name="RabbitMQ Installation and Configuration">
 <p>This document describes installation and configuration of RabbitMQ Message Broker.</p>
 
-<subsection name="Docker Quick Start">
+<p>
+<ul>
+  <li><a href="#docker">Docker Quick Start</a></li>
+  <li><a href="#linux">Linux, Windows, MacOS</a></li>
+  <li><a href="#refs">External References</a></li>
+</ul>
+</p>
+
+<!-- =========================================================== -->
+
+<subsection id="docker" name="Docker Quick Start">
+
+<!-- ========= -->
 
 <h4>Create and Start Container</h4>
 
@@ -70,6 +82,8 @@ curl -u guest:guest http://localhost:15672/api/cluster-name
 {"name":"rabbit@rabbit"}
 </source>
 
+<!-- ========= -->
+
 <h4>Create Harvest User</h4>
 
 <p>To run commands in RabbitMQ container, execute an interactive bash shell in the container:</p>
@@ -79,7 +93,7 @@ docker exec -it rabbit bash
 
 <p>Now we can create "harvest" user. In this example we will make "harvest" user an administrator.</p>
 <source>
-rabbitmqctl add_user harvest harvest
+rabbitmqctl add_user harvest harvest1234
 rabbitmqctl set_user_tags harvest administrator
 rabbitmqctl set_permissions -p / harvest ".*" ".*" ".*"
 </source>
@@ -95,13 +109,36 @@ rabbitmqctl change_password guest guest1234
 rabbitmqctl delete_user guest
 </source>
 
-<h4>References</h4>
+<!-- ========= -->
+
+<h4>Create Queues</h4>
+<source>
+rabbitmqadmin declare queue -u harvest -p harvest1234 --vhost=/ name=harvest.jobs durable=true
+rabbitmqadmin declare queue -u harvest -p harvest1234 --vhost=/ name=harvest.dirs durable=true
+rabbitmqadmin declare queue -u harvest -p harvest1234 --vhost=/ name=harvest.products durable=true
+rabbitmqadmin declare queue -u harvest -p harvest1234 --vhost=/ name=harvest.collections durable=true
+</source>
+
+<!-- =========================================================== -->
+
+<subsection id="linux" name="Linux, Windows, MacOS">
+<p>Installation guides for Linux, Windows, and MacOS are available on 
+<a href="https://www.rabbitmq.com/download.html" target="_blank">RabbitMQ web site</a>.
+After installing RabbitMQ, create "harvest" user (optional) and harvest queues (required)
+as described in previous section.
+</p>
+</subsection>
+
+<!-- =========================================================== -->
+
+<subsection id="refs" name="External References">
 <ul>
+<li><a href="https://www.rabbitmq.com/download.html" target="_blank">Installing RabbitMQ</a></li>
+<li><a href="https://www.rabbitmq.com/management.html" target="_blank">Management Plugin</a></li>
 <li><a href="https://rawcdn.githack.com/rabbitmq/rabbitmq-server/v3.9.11/deps/rabbitmq_management/priv/www/api/index.html"
-target="_blank">RabbitMQ Management REST API</a></li>
+target="_blank">Management REST API</a></li>
 </ul>
-
-
+</subsection>
 
 </section>
 
