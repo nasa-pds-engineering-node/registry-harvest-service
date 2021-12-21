@@ -41,6 +41,68 @@ POSSIBILITY OF SUCH DAMAGE.
 <section name="Harvest Server Installation and Configuration">
 <p>This document describes installation and configuration of Harvest Server.</p>
 
+<h4>Installation</h4>
+
+<p>Download latest <a href="https://github.com/NASA-PDS/big-data-harvest-server/releases" target="_blank">binary 
+release (ZIP file)</a> and extract it to some directory, such as <i>/opt/big-data-harvest-1.0.0</i>
+</p>
+
+<h4>Running</h4>
+<p>Run <i>harvest-server</i> in <i>$HARVEST_HOME/bin/</i> without any parameters to print usage information.</p>
+
+<source>
+/opt/big-data-harvest-1.0.0/bin/harvest-server
+</source>
+
+<source>
+Usage: harvest-server &lt;options&gt;
+
+Commands:
+  -c &lt;config file&gt;   Start Harvest server
+  -V, --version      Print Harvest version
+
+Optional parameters:
+  -l &lt;file&gt;    Log file. Default is /tmp/harvest/harvest.log
+  -v &lt;level&gt;   Logger verbosity: DEBUG / ALL, INFO (default), WARN, ERROR
+</source>
+
+<p>To start the server, run</p>
+
+<source>
+/opt/big-data-harvest-1.0.0/bin/harvest-server -c /opt/big-data-harvest-1.0.0/conf/harvest-server.cfg
+</source>
+
+<h4>Configuration</h4>
+<p>
+Example configuration file is located in the installation directory, <i>$HARVEST_HOME/conf/harvest-server.cfg</i>.
+</p>
+<p><b>Message Broker Parameters</b></p>
+<table>
+<tr><th width="20%">Parameter</th><th>Description</th></tr>
+<tr><td>mq.type</td><td>Message broker type. Currently only "RabbitMQ" is supported. We can add more types in future releases.</td></tr>
+<tr><td>rmq.host</td><td>RabbitMQ "host:port" tuples (one tuple per line). For example, "localhost:5672".</td></tr>
+<tr><td>rmq.user</td><td>RabbitMQ user. For example, "harvest".</td></tr>
+<tr><td>rmq.password</td><td>RabbitMQ password. For example, "harvest1234".</td></tr>
+</table>
+
+<p><b>Registry (Elasticsearch) Parameters</b></p>
+<table>
+<tr><th width="20%">Parameter</th><th>Description</th></tr>
+<tr><td>es.url</td><td>Elasticsearch (Registry) URL. For example, "http://localhost:9200".</td></tr>
+<tr><td>es.index</td><td>Elasticsearch (Registry) index name. For example, "registry".</td></tr>
+<tr><td>es.authFile</td><td>Optional parameter. Elasticsearch authentication file. For example, "/etc/pds-registry/auth.cfg"</td></tr>
+</table>
+
+<p><b>Other Parameters</b></p>
+<table>
+<tr><th width="20%">Parameter</th><th>Description</th></tr>
+<tr><td>web.port</td><td>Embedded web server port. Default value is 8005.</td></tr>
+<tr><td>harvest.storeLabels</td><td>Optional parameter. Store original PDS labels (XML) as BLOBs. Default value is "true".</td></tr>
+<tr><td>harvest.storeJsonLabels</td><td>Optional parameter. Store PDS labels in JSON format as BLOBs. Default value is "true".</td></tr>
+<tr><td>harvest.processDataFiles</td><td>Optional parameter. Extract basic file information and calculate MD5 hashes 
+of all data files referenced in a PDS label.</td></tr>
+</table>
+
 </section>
 
 </body>

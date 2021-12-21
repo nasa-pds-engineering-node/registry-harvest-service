@@ -115,7 +115,7 @@ public class HarvestServerMain
      */
     public static void printHelp()
     {
-        System.out.println("Usage: harvest <options>");
+        System.out.println("Usage: harvest-server <options>");
         System.out.println();
         System.out.println("Commands:");
         System.out.println("  -c <config file>   Start Harvest server");
