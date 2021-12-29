@@ -63,7 +63,7 @@
       <directory>src/main/resources/bin</directory>
       <outputDirectory>bin</outputDirectory>
       <includes>
-        <include>harvest</include>
+        <include>harvest-server</include>
       </includes>
       <fileMode>775</fileMode>
       <lineEnding>unix</lineEnding>
@@ -76,7 +76,7 @@
       <directory>src/main/resources/bin</directory>
       <outputDirectory>bin</outputDirectory>
       <includes>
-        <include>harvest.bat</include>
+        <include>harvest-server.bat</include>
       </includes>
       <fileMode>775</fileMode>
       <lineEnding>dos</lineEnding>
@@ -96,8 +96,8 @@
     </fileSet>
 
     <fileSet>
-      <directory>src/main/resources/xsd</directory>
-      <outputDirectory>xsd</outputDirectory>
+      <directory>src/main/resources/elastic</directory>
+      <outputDirectory>elastic</outputDirectory>
       <fileMode>664</fileMode>
       <lineEnding>dos</lineEnding>
       <excludes>

@@ -48,7 +48,7 @@ release (ZIP file)</a> and extract it to some directory, such as <i>/opt/big-dat
 </p>
 
 <h4>Running</h4>
-<p>Run <i>harvest-server</i> in <i>$HARVEST_HOME/bin/</i> without any parameters to print usage information.</p>
+<p>Run <i>harvest-server</i> in <i>bin</i> directory without any parameters to print usage information.</p>
 
 <source>
 /opt/big-data-harvest-1.0.0/bin/harvest-server

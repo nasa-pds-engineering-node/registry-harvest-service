@@ -41,6 +41,57 @@ POSSIBILITY OF SUCH DAMAGE.
 <section name="Crawler Server Installation and Configuration">
 <p>This document describes installation and configuration of Crawler Server.</p>
 
+<h4>Installation</h4>
+
+<p>Download latest <a href="https://github.com/NASA-PDS/big-data-crawler-server/releases" target="_blank">binary 
+release (ZIP file)</a> and extract it to some directory, such as <i>/opt/big-data-crawler-1.0.0</i>
+</p>
+
+<h4>Running</h4>
+<p>Run <i>crawler-server</i> in <i>bin</i> directory without any parameters to print usage information.</p>
+
+<source>
+/opt/big-data-crawler-1.0.0/bin/crawler-server
+</source>
+
+<source>
+Usage: crawler-server &lt;options&gt;
+
+Commands:
+  -c &lt;config file&gt;   Start Crawler server
+  -V, --version      Print Crawler version
+
+Optional parameters:
+  -l &lt;file&gt;    Log file. Default is /tmp/crawler/crawler.log
+  -v &lt;level&gt;   Logger verbosity: DEBUG / ALL, INFO (default), WARN, ERROR
+</source>
+
+<p>To start the server, run</p>
+
+<source>
+/opt/big-data-crawler-1.0.0/bin/crawler-server -c /opt/big-data-crawler-1.0.0/conf/crawler-server.cfg
+</source>
+
+<h4>Configuration</h4>
+<p>
+Example configuration file is located in the installation directory, <i>$CRAWLER_HOME/conf/crawler-server.cfg</i>.
+</p>
+<p><b>Message Broker Parameters</b></p>
+<table>
+<tr><th width="20%">Parameter</th><th>Description</th></tr>
+<tr><td>mq.type</td><td>Message broker type. Currently only "RabbitMQ" is supported. We can add more types in future releases.</td></tr>
+<tr><td>rmq.host</td><td>RabbitMQ "host:port" tuples (one tuple per line). For example, "localhost:5672".</td></tr>
+<tr><td>rmq.user</td><td>RabbitMQ user. For example, "harvest".</td></tr>
+<tr><td>rmq.password</td><td>RabbitMQ password. For example, "harvest1234".</td></tr>
+</table>
+
+<p><b>Other Parameters</b></p>
+<table>
+<tr><th width="20%">Parameter</th><th>Description</th></tr>
+<tr><td>web.port</td><td>Embedded web server port. Default value is 8001.</td></tr>
+</table>
+
+
 </section>
 
 </body>

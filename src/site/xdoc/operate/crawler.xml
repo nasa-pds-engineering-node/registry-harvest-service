@@ -33,40 +33,29 @@ POSSIBILITY OF SUCH DAMAGE.
 
 <document>
 <properties>
-  <title>Harvest Client Installation</title>
+  <title>Crawler Server Operation</title>
 </properties>
 
 <body>
 
-<section name="Harvest Client Installation and Configuration">
-<p>This document describes installation and configuration of Harvest Client.</p>
+<section name="Crawler Server Operation">
 
-<h4>Installation</h4>
-
-<p>Download latest <a href="https://github.com/NASA-PDS/big-data-harvest-client/releases" target="_blank">binary 
-release (ZIP file)</a> and extract it to some directory, such as <i>/opt/big-data-harvest-client-1.0.0</i>
-</p>
-
-<h4>Running</h4>
-<p>Run <i>harvest-client</i> in <i>bin</i> directory without any parameters to print usage information.</p>
+<subsection name="Monitoring">
 
 <source>
-/opt/big-data-harvest-client-1.0.0/bin/harvest-client
+{
+  "application": "Crawler",
+  "version": "1.0.0-SNAPSHOT",
+  "buildTime": "2021-11-18T18:48:13Z",
+  "mqType": "RabbitMQ",
+  "mqConnection": "localhost:5672",
+  "mqStatus": "UP",
+  "usedMemory": "13 MB",
+  "openFiles": "20"
+}
 </source>
 
-<source>
-Usage: harvest-client &lt;command&gt; &lt;options&gt;
-
-Commands:
-  harvest         Submit new harvest job
-  -V, --version   Print Harvest Client version
-
-Optional parameters:
-  -v &lt;value&gt;   Log verbosity: DEBUG, INFO, WARN, ERROR. Default is INFO.
-  -help        Pass -help after any command to see command-specific usage information, for example,
-               harvest-client harvest -help
-
-</source>
+</subsection>
 
 </section>
 

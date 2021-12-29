@@ -223,6 +223,7 @@ Go through this file line-by-line and replace the template values with your own.
                         </goals>
                         <configuration>
                             <descriptors>
+                                <descriptor>src/main/assembly/tar-assembly.xml</descriptor>
                                 <descriptor>src/main/assembly/zip-assembly.xml</descriptor>
                             </descriptors>
                         </configuration>

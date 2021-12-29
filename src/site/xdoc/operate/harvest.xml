@@ -33,41 +33,12 @@ POSSIBILITY OF SUCH DAMAGE.
 
 <document>
 <properties>
-  <title>Harvest Client Installation</title>
+  <title>Harvest Server Operation</title>
 </properties>
 
 <body>
 
-<section name="Harvest Client Installation and Configuration">
-<p>This document describes installation and configuration of Harvest Client.</p>
-
-<h4>Installation</h4>
-
-<p>Download latest <a href="https://github.com/NASA-PDS/big-data-harvest-client/releases" target="_blank">binary 
-release (ZIP file)</a> and extract it to some directory, such as <i>/opt/big-data-harvest-client-1.0.0</i>
-</p>
-
-<h4>Running</h4>
-<p>Run <i>harvest-client</i> in <i>bin</i> directory without any parameters to print usage information.</p>
-
-<source>
-/opt/big-data-harvest-client-1.0.0/bin/harvest-client
-</source>
-
-<source>
-Usage: harvest-client &lt;command&gt; &lt;options&gt;
-
-Commands:
-  harvest         Submit new harvest job
-  -V, --version   Print Harvest Client version
-
-Optional parameters:
-  -v &lt;value&gt;   Log verbosity: DEBUG, INFO, WARN, ERROR. Default is INFO.
-  -help        Pass -help after any command to see command-specific usage information, for example,
-               harvest-client harvest -help
-
-</source>
-
+<section name="Harvest Server Operation">
 </section>
 
 </body>

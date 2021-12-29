@@ -64,10 +64,11 @@ POSSIBILITY OF SUCH DAMAGE.
                 <item name="Harvest Server" href="install/harvest.html"/>
                 <item name="Harvest Client" href="install/harvest-client.html"/>
             </item>
-            <item name='Operation' href='operate/index.html'/>
-            <!--
-            <item name='What to do if it start smoking' href='explosion/index.html'/>
-            -->
+            <item name='Operation' href='operate/index.html'>
+                <item name="Crawler Server" href="operate/crawler.html"/>
+                <item name="Harvest Server" href="operate/harvest.html"/>
+                <item name="Harvest Client" href="operate/harvest-client.html"/>
+            </item>
         </menu>
  
         <!--
