@@ -39,6 +39,40 @@ POSSIBILITY OF SUCH DAMAGE.
 <body>
 
 <section name="Harvest Server Operation">
+
+<subsection name="Monitoring">
+<p>
+Harvest server has embedded web server. By default it listens on port 8005.
+To view basic stats, such as Harvest version, used memory, number of open files, 
+and message broker status, run the following curl command (change host name if needed).
+</p>
+
+<source>
+curl http://localhost:8005
+</source>
+
+<source>
+{
+  "application": "Harvest",
+  "version": "1.0.0-SNAPSHOT",
+  "buildTime": "2021-12-29T20:06:02Z",
+  "mqType": "RabbitMQ",
+  "mqConnection": "localhost:5672",
+  "mqStatus": "UP",
+  "esUrl": "http://localhost:9200",
+  "esIndex": "registry",
+  "usedMemory": "30 MB",
+  "openFiles": "20"
+}
+</source>
+
+<p>
+NOTE: Number of open files is only available on Unix. 
+The value is reported by JVM and includes some open system libraries and JARs.
+</p>
+
+</subsection>
+
 </section>
 
 </body>

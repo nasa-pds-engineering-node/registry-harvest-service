@@ -41,6 +41,15 @@ POSSIBILITY OF SUCH DAMAGE.
 <section name="Crawler Server Operation">
 
 <subsection name="Monitoring">
+<p>
+Crawler server has embedded web server. By default it listens on port 8001.
+To view basic stats, such as Crawler version, used memory, number of open files, 
+and message broker status, run the following curl command (change host name if needed).
+</p>
+
+<source>
+curl http://localhost:8001
+</source>
 
 <source>
 {
@@ -54,6 +63,11 @@ POSSIBILITY OF SUCH DAMAGE.
   "openFiles": "20"
 }
 </source>
+
+<p>
+NOTE: Number of open files is only available on Unix. 
+The value is reported by JVM and includes some open system libraries and JARs.
+</p>
 
 </subsection>
 

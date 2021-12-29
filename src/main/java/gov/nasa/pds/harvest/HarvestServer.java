@@ -130,7 +130,7 @@ public class HarvestServer
         ServletHandler handler = new ServletHandler();
         
         // Status servlet
-        ServletHolder statusServlet = new ServletHolder(new StatusServlet(mqClient));
+        ServletHolder statusServlet = new ServletHolder(new StatusServlet(cfg, mqClient));
         handler.addServletWithMapping(statusServlet, "/");
 
         // Memory servlet

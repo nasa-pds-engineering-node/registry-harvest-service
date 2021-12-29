@@ -74,7 +74,8 @@ Optional parameters:
 
 <h4>Configuration</h4>
 <p>
-Example configuration file is located in the installation directory, <i>$HARVEST_HOME/conf/harvest-server.cfg</i>.
+Example configuration file is located in the installation directory, (<i>/conf/harvest-server.cfg</i>).
+The following parameters are available.
 </p>
 <p><b>Message Broker Parameters</b></p>
 <table>

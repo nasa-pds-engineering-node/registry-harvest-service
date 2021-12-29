@@ -68,6 +68,20 @@ Optional parameters:
 
 </source>
 
+<h4>Configuration</h4>
+<p>
+Example configuration file is located in the installation directory, (<i>/conf/harvest-client.cfg</i>).
+The following parameters are available.
+</p>
+<p><b>Message Broker Parameters</b></p>
+<table>
+<tr><th width="20%">Parameter</th><th>Description</th></tr>
+<tr><td>mq.type</td><td>Message broker type. Currently only "RabbitMQ" is supported. We can add more types in future releases.</td></tr>
+<tr><td>rmq.host</td><td>RabbitMQ "host:port" tuples (one tuple per line). For example, "localhost:5672".</td></tr>
+<tr><td>rmq.user</td><td>RabbitMQ user. For example, "harvest".</td></tr>
+<tr><td>rmq.password</td><td>RabbitMQ password. For example, "harvest1234".</td></tr>
+</table>
+
 </section>
 
 </body>
