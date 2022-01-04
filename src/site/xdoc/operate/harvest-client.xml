@@ -39,6 +39,142 @@ POSSIBILITY OF SUCH DAMAGE.
 <body>
 
 <section name="Harvest Client Operation">
+
+<!-- ========================================================== -->
+
+<subsection name="Quick Start">
+
+
+<!-- ==================== -->
+<h4>Configuration File</h4>
+<p>
+Harvest client requires message broker (RabbitMQ) connection to submit jobs to the Harvest server cluster.
+Default configuration file, <i>&lt;INSTALL_DIR&gt;/conf/harvest-client.cfg</i>, has the following parameters:
+</p>
+
+<source>
+# Message server type. Currently, only 'RabbitMQ' is supported.
+mq.type = RabbitMQ
+
+# RabbitMQ host(s). One or more host:port tuples (one tuple per line).
+rmq.host = localhost:5672
+
+# RabbitMQ user
+rmq.user = harvest
+
+# RabbitMQ password
+rmq.password = harvest
+</source>
+
+<p>
+You may need to update RabbitMQ host, user and password.
+</p>
+
+<!-- ==================== -->
+<h4>View Help</h4>
+
+<p>
+To print usage information, run <i>harvest-client</i> without any parameters:
+</p>
+
+<source>
+&lt;INSTALL_DIR&gt;/bin/harvest-client
+</source>
+
+<source>
+Usage: harvest-client &lt;command&gt; &lt;options&gt;
+
+Commands:
+  harvest         Submit new harvest job
+  -V, --version   Print Harvest Client version
+
+Options:
+  -v &lt;value&gt;   Log verbosity: DEBUG, INFO, WARN, ERROR. Default is INFO.
+  -help        Pass -help after any command to see command-specific usage information, for example,
+               harvest-client harvest -help
+
+</source>
+
+<p>
+To see help for the "harvest" command, run:
+</p>
+
+<source>
+&lt;INSTALL_DIR&gt;/bin/harvest-client harvest -help
+</source>
+
+<source>
+Usage: harvest-client harvest &lt;options&gt;
+
+Submit new harvest job
+
+Required parameters:
+  -j &lt;path&gt;   Harvest job file
+
+Optional parameters:
+  -c &lt;path&gt;    Harvest Client configuration file. Default is $HARVEST_CLIENT_HOME/conf/harvest.cfg
+  -overwrite   Overwrite registered products
+</source>
+
+<!-- ==================== -->
+<h4>Submit a Job</h4>
+
+<p>
+To submit a job to the harvest server cluster you need a job configuration file. 
+An example configuration file is available in the installation directory:
+<i>&lt;INSTALL_DIR&gt;/examples/directories.xml</i>. 
+</p>
+
+<p>
+You will need to update the nodeName:
+<source>
+&lt;harvest nodeName="PDS_ATM"&gt;
+</source>
+
+The path to the data:
+<source>
+  &lt;directories&gt;
+    &lt;path&gt;/data/OREX/orex_spice&lt;/path&gt;
+  &lt;/directories&gt;
+</source>
+  
+And the URL prefix for the data:
+<source>
+  &lt;fileInfo&gt;
+    &lt;!-- UPDATE with your own local path and base url where pds4 archive are published --&gt;
+    &lt;fileRef replacePrefix="/data" with="https://pds-atmospheres.nmsu.edu/" /&gt;
+  &lt;/fileInfo&gt;
+</source>
+</p>
+
+<p>
+If you save this file as <i>/tmp/job1.xml</i> and run Harvest Client
+<source>
+&lt;INSTALL_DIR&gt;/bin/harvest-client harvest -j /tmp/job1.xml
+</source>
+</p>
+<p>
+You should see output similar to this:
+<source>
+[INFO] Reading job from /tmp/job1.xml
+[INFO] Reading configuration from /tmp/big-data-harvest-client-1.0.0-SNAPSHOT/conf/harvest-client.cfg
+[INFO] Creating new job...
+[INFO] Connecting to RabbitMQ
+[INFO] Created job f282a012-115e-429c-b445-f5eed1d81303
+</source>
+</p>
+
+<h4>Next Steps</h4>
+<p>
+Monitor RabbitMQ, Crawler, Harvest, and Elasticsearch servers for progress of your job.
+</p>
+
+</subsection>
+
+
+<!-- ====================================================================== -->
+
+
 </section>
 
 </body>
