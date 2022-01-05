@@ -43,6 +43,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 <h4>Server Components</h4>
 <ul>
+<li><a href="registry.html">PDS Registry (Elasticsearch)</a></li>
 <li><a href="rabbit.html">RabbitMQ Message Broker</a></li>
 <li><a href="crawler.html">Crawler Server</a></li>
 <li><a href="harvest.html">Harvest Server</a></li>

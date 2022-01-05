@@ -59,6 +59,7 @@ POSSIBILITY OF SUCH DAMAGE.
         <menu name='Documentation'>
             <item name='About Scalable Harvest' href='index.html'/>
             <item name='Installation' href='install/index.html'>
+                <item name="PDS Registry" href="install/registry.html"/>
                 <item name="RabbitMQ" href="install/rabbit.html"/>
                 <item name="Crawler Server" href="install/crawler.html"/>
                 <item name="Harvest Server" href="install/harvest.html"/>
