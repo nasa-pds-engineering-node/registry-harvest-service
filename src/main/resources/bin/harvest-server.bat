@@ -8,7 +8,7 @@ IF NOT DEFINED JAVA_HOME (
 
   java -version > nul 2>&1 
   IF NOT %errorlevel% == 0 (
-    @echo Java 11 or later is required to run Registry Manager.
+    @echo Java 11 or later is required to run Harvest.
     endlocal
     exit /b 0
   )
