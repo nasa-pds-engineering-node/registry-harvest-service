@@ -2,6 +2,9 @@ package gov.nasa.pds.harvest.mq.rmq;
 
 import gov.nasa.pds.harvest.cfg.HarvestCfg;
 import gov.nasa.pds.harvest.cfg.RegistryCfg;
+import gov.nasa.pds.harvest.mq.CollectionInventoryConsumer;
+import gov.nasa.pds.harvest.mq.ManagerCommandConsumer;
+import gov.nasa.pds.harvest.mq.ProductConsumer;
 
 /**
  * Creates product and collection inventory consumers
@@ -44,6 +47,18 @@ public class ConsumerFactory
     public CollectionInventoryConsumer createCollectionInventoryConsumer() throws Exception
     {
         CollectionInventoryConsumer consumer = new CollectionInventoryConsumer(registryCfg);
+        return consumer;
+    }
+    
+    
+    /**
+     * Create manager command consumer
+     * @return new product consumer
+     * @throws Exception an exception
+     */
+    public ManagerCommandConsumer createManagerCommandConsumer() throws Exception
+    {
+        ManagerCommandConsumer consumer = new ManagerCommandConsumer(registryCfg);
         return consumer;
     }
 

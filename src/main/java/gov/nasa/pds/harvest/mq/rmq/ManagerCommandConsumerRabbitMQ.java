@@ -12,29 +12,29 @@ import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 
 import gov.nasa.pds.harvest.Constants;
-import gov.nasa.pds.harvest.mq.CollectionInventoryConsumer;
-import gov.nasa.pds.harvest.mq.msg.CollectionInventoryMessage;
-
+import gov.nasa.pds.harvest.mq.ManagerCommandConsumer;
+import gov.nasa.pds.harvest.mq.msg.ManagerMessage;
 
 /**
- * A consumer of file messages from a RabbitMQ queue
+ * A RabbitMQ consumer of manager messages
  * @author karpenko
  */
-public class CollectionInventoryConsumerRabbitMQ extends DefaultConsumer
+public class ManagerCommandConsumerRabbitMQ extends DefaultConsumer
 {
     private Logger log;
     private Gson gson;
     
-    private CollectionInventoryConsumer collectionInventoryConsumer;
+    private ManagerCommandConsumer mgrConsumer;
+
     
     /**
      * Constructor
      * @param channel RabbitMQ connection channel
      */
-    public CollectionInventoryConsumerRabbitMQ(Channel channel, CollectionInventoryConsumer consumer)
+    public ManagerCommandConsumerRabbitMQ(Channel channel, ManagerCommandConsumer mgrConsumer)
     {
         super(channel);
-        this.collectionInventoryConsumer = consumer;
+        this.mgrConsumer = mgrConsumer;
         
         log = LogManager.getLogger(this.getClass());        
         gson = new Gson();
@@ -47,7 +47,7 @@ public class CollectionInventoryConsumerRabbitMQ extends DefaultConsumer
      */
     public void start() throws Exception
     {
-        getChannel().basicConsume(Constants.MQ_COLLECTION_INVENTORY, false, this);
+        getChannel().basicConsume(Constants.MQ_MANAGER_COMMANDS, false, this);
     }
 
     
@@ -58,9 +58,9 @@ public class CollectionInventoryConsumerRabbitMQ extends DefaultConsumer
         long deliveryTag = envelope.getDeliveryTag();
 
         String jsonStr = new String(body);
-        CollectionInventoryMessage msg = gson.fromJson(jsonStr, CollectionInventoryMessage.class);
+        ManagerMessage msg = gson.fromJson(jsonStr, ManagerMessage.class);
         
-        if(collectionInventoryConsumer.processMessage(msg))
+        if(mgrConsumer.processMessage(msg))
         {
             // ACK message (delete from the queue)
             getChannel().basicAck(deliveryTag, false);
@@ -71,6 +71,5 @@ public class CollectionInventoryConsumerRabbitMQ extends DefaultConsumer
             getChannel().basicReject(deliveryTag, true);
         }
     }
-    
-    
+
 }

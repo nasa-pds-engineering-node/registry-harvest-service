@@ -12,6 +12,7 @@ import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 
 import gov.nasa.pds.harvest.Constants;
+import gov.nasa.pds.harvest.mq.ProductConsumer;
 import gov.nasa.pds.harvest.mq.msg.ProductMessage;
 
 

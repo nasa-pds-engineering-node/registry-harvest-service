@@ -8,8 +8,8 @@ import gov.nasa.pds.harvest.cfg.RegistryCfg;
 import gov.nasa.pds.harvest.dao.RegistryManager;
 import gov.nasa.pds.harvest.dao.SchemaDao;
 import gov.nasa.pds.harvest.meta.FieldNameCache;
+import gov.nasa.pds.harvest.mq.ProductConsumer;
 import gov.nasa.pds.harvest.mq.msg.ProductMessage;
-import gov.nasa.pds.harvest.mq.rmq.ProductConsumer;
 import gov.nasa.pds.harvest.util.Log4jConfigurator;
 
 

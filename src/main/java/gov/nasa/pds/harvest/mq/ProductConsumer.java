@@ -1,4 +1,4 @@
-package gov.nasa.pds.harvest.mq.rmq;
+package gov.nasa.pds.harvest.mq;
 
 import java.io.File;
 import java.util.List;

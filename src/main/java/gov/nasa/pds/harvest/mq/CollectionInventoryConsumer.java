@@ -1,4 +1,4 @@
-package gov.nasa.pds.harvest.mq.rmq;
+package gov.nasa.pds.harvest.mq;
 
 import java.io.File;
 
@@ -10,13 +10,21 @@ import gov.nasa.pds.harvest.mq.msg.CollectionInventoryMessage;
 import gov.nasa.pds.harvest.proc.CollectionInventoryProcessor;
 import gov.nasa.pds.harvest.util.ExceptionUtils;
 
-
+/**
+ * Consume collection inventory messages
+ * @author karpenko
+ */
 public class CollectionInventoryConsumer
 {
     protected Logger log;
     private CollectionInventoryProcessor proc;
     
     
+    /**
+     * Constructor
+     * @param cfg registry (Elasticsearch) configuration
+     * @throws Exception an exception
+     */
     public CollectionInventoryConsumer(RegistryCfg cfg) throws Exception
     {
         log = LogManager.getLogger(this.getClass());
@@ -24,6 +32,11 @@ public class CollectionInventoryConsumer
     }
     
     
+    /**
+     * Process collection inventory message
+     * @param msg collection inventory message
+     * @return true if message successfully processed
+     */
     public boolean processMessage(CollectionInventoryMessage msg)
     {
         if(msg == null) return true;
