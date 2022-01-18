@@ -56,10 +56,22 @@ public class ProductConsumerRabbitMQ extends DefaultConsumer
             AMQP.BasicProperties properties, byte[] body) throws IOException
     {
         long deliveryTag = envelope.getDeliveryTag();
-
-        String jsonStr = new String(body);
-        ProductMessage msg = gson.fromJson(jsonStr, ProductMessage.class);
+        ProductMessage msg = null;
         
+        try
+        {
+            String jsonStr = new String(body);
+            msg = gson.fromJson(jsonStr, ProductMessage.class);            
+        }
+        catch(Exception ex)
+        {
+            log.error("Invalid message", ex);
+
+            // ACK message (delete from the queue)
+            getChannel().basicAck(deliveryTag, false);
+            return;
+        }
+
         if(prodConsumer.processMessage(msg))
         {
             // ACK message (delete from the queue)

@@ -40,7 +40,7 @@ public class TestProductConsumer
     {
         RegistryManager.init(cfg);
 
-        SchemaDao schemaDao = RegistryManager.getInstance().getSchemaDAO();
+        SchemaDao schemaDao = RegistryManager.getInstance().getSchemaDao();
         Set<String> fields = schemaDao.getFieldNames();
         FieldNameCache.getInstance().set(fields);
     }

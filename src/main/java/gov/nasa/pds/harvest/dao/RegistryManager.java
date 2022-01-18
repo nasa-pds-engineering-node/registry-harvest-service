@@ -21,6 +21,7 @@ public class RegistryManager
     private RestClient esClient;
     private RegistryDao registryDao;
     private SchemaDao schemaDao;
+    private ProductDao productDao;
     
     
     /**
@@ -46,6 +47,7 @@ public class RegistryManager
         
         registryDao = new RegistryDao(esClient, indexName);
         schemaDao = new SchemaDao(esClient, indexName);
+        productDao = new ProductDao(esClient, indexName);
     }
     
     
@@ -86,7 +88,7 @@ public class RegistryManager
      * Get registry DAO object.
      * @return Registry DAO
      */
-    public RegistryDao getRegistryDAO()
+    public RegistryDao getRegistryDao()
     {
         return registryDao;
     }
@@ -96,9 +98,19 @@ public class RegistryManager
      * Get schema DAO object.
      * @return Schema DAO
      */
-    public SchemaDao getSchemaDAO()
+    public SchemaDao getSchemaDao()
     {
         return schemaDao;
+    }
+
+    
+    /**
+     * Get product DAO object.
+     * @return Product DAO
+     */
+    public ProductDao getProductDao()
+    {
+        return productDao;
     }
 
 }

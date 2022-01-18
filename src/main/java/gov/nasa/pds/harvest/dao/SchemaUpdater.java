@@ -73,7 +73,7 @@ public class SchemaUpdater
         {
             log.info("Updating Elasticsearch schema.");
 
-            SchemaDao dao = RegistryManager.getInstance().getSchemaDAO();
+            SchemaDao dao = RegistryManager.getInstance().getSchemaDao();
             List<Tuple> newFields = dao.getDataTypes(fields);
             if(newFields != null)
             {
@@ -103,7 +103,7 @@ public class SchemaUpdater
         String schemaFileName = jsonUrl.substring(idx+1);
         
         // Get stored LDDs info
-        SchemaDao dao = RegistryManager.getInstance().getSchemaDAO();
+        SchemaDao dao = RegistryManager.getInstance().getSchemaDao();
         LddInfo lddInfo = dao.getLddInfo(prefix);
 
         // LDD already loaded

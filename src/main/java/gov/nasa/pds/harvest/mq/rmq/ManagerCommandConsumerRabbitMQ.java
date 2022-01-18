@@ -56,9 +56,21 @@ public class ManagerCommandConsumerRabbitMQ extends DefaultConsumer
             AMQP.BasicProperties properties, byte[] body) throws IOException
     {
         long deliveryTag = envelope.getDeliveryTag();
+        ManagerMessage msg = null;
+        
+        try
+        {
+            String jsonStr = new String(body);
+            msg = gson.fromJson(jsonStr, ManagerMessage.class);
+        }
+        catch(Exception ex)
+        {
+            log.error("Invalid message", ex);
 
-        String jsonStr = new String(body);
-        ManagerMessage msg = gson.fromJson(jsonStr, ManagerMessage.class);
+            // ACK message (delete from the queue)
+            getChannel().basicAck(deliveryTag, false);
+            return;
+        }
         
         if(mgrConsumer.processMessage(msg))
         {
