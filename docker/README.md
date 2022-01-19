@@ -2,15 +2,17 @@
 
 ## 🏃 Steps to build the docker image of the Big Data Harvest Server
 
-#### 1. Update (if required) the following version in the `Dockerfile` with a compatible Big Data Harvest Server version.
+#### 1. Update (if required) the following versions in the `Dockerfile` with a compatible versions.
 
 | Variable                        | Description |
 | ------------------------------- | ------------|
 | big_data_harvest_server_version | The version of the Big Data Harvest Server release to be included in the docker image|
+| reg_manager_version             | The version of the Registry Manager release to be included in the docker image|
 
 ```    
-# Set the following argument with a compatible Big Data Harvest Server version
+# Set the following arguments with compatible versions
 ARG big_data_harvest_server_version=1.0.0-SNAPSHOT
+ARG reg_manager_version=4.2.0
 ```
 
 #### 2. Open a terminal and change the current working directory to `big-data-harvest-server/docker`.
@@ -48,17 +50,22 @@ keep it in a local file location such as `/tmp/cfg/harvest-server.cfg`.
 
 | Variable                   | Description |
 | -------------------------- | ----------- |
-| HARVEST_SERVER_CONFIG_FILE | # Absolute path for the Big Data Harvest Server configuration file in the host machine (E.g.: `/tmp/cfg/harvest-server.cfg`) |
-| HARVEST_DATA_DIR           | Absolute path for the Harvest data directory in the host machine (E.g.: `/tmp/data/urn-nasa-pds-insight_rad`) |
+| ES_URL                     | Elasticsearch URL (E.g.: http://192.168.0.1:9200) |
+| HARVEST_SERVER_CONFIG_FILE | Absolute path for the Big Data Harvest Server configuration file in the host machine (E.g.: `/tmp/cfg/harvest-server.cfg`) |
+| HARVEST_DATA_DIR           | Absolute path for the Harvest data directory in the host machine (E.g.: /tmp/big-data-harvest-data/urn-nasa-pds-insight_rad). This directory will get created automatically, if the big-data-harvest-client is executed with the option to download test data. |
 
 ```    
 # Update the following environment variables before executing this script
 
-# Absolute path for the Big Data Harvest Server configuration file in the host machine (E.g.: /tmp/cfg/crawler-server.cfg)
-CRAWLER_SERVER_CONFIG_FILE=/tmp/cfg/crawler-server.cfg
+# Elasticsearch URL (E.g.: http://192.168.0.1:9200)
+ES_URL=http://192.168.0.1:9200
 
-# Absolute path for the Harvest data directory in the host machine (E.g.: /tmp/data/urn-nasa-pds-insight_rad)
-HARVEST_DATA_DIR=/tmp/data
+# Absolute path for the Big Data Harvest Server configuration file in the host machine (E.g.: /tmp/cfg/harvest-server.cfg)
+HARVEST_SERVER_CONFIG_FILE=/tmp/cfg/harvest-server.cfg
+
+# Absolute path for the Harvest data directory in the host machine (E.g.: /tmp/big-data-harvest-data/urn-nasa-pds-insight_rad).
+# This directory will get created automatically, if the big-data-harvest-client is executed with the option to download test data.
+HARVEST_DATA_DIR=/tmp/big-data-harvest-data
 ```
 
 #### 3. Open a terminal and change the current working directory to `big-data-harvest-server/docker`.

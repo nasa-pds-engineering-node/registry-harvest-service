@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # Copyright 2022, California Institute of Technology ("Caltech").
 # U.S. Government sponsorship acknowledged.
 #
@@ -28,31 +30,23 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM openjdk:11-slim
+# ------------------------------------------------------------------------------
+# This shell script provides an entrypoint for the Big Data Harvest Server docker image.
+# ------------------------------------------------------------------------------
 
-# Set the following arguments with compatible versions
-ARG big_data_harvest_server_version=1.0.0-SNAPSHOT
-ARG reg_manager_version=4.2.0
+# Check if the ES_URL environment variable is set
+if [ -z "$ES_URL" ]; then
+    echo "Error: 'ES_URL' (Elasticsearch URL) environment variable is not set. Use docker's -e option." 1>&2
+    exit 1
+fi
 
-ENV BIG_DATA_HARVEST_SERVER_BIN_PATH=https://github.com/NASA-PDS/big-data-harvest-server/releases/download/v${big_data_harvest_server_version}/big-data-harvest-${big_data_harvest_server_version}-bin.tar.gz
-ENV REG_MANAGER_IMAGE_PATH=https://github.com/NASA-PDS/pds-registry-mgr-elastic/releases/download/v${reg_manager_version}/registry-manager-${reg_manager_version}-bin.tar.gz
+echo "Waiting for Elasticsearch to launch..."  1>&2
+while ! curl --output /dev/null --silent --head --fail "$ES_URL"; do
+  sleep 1
+done
 
-# Install Big Data Harvest Server and Registry Manager
-ADD $BIG_DATA_HARVEST_SERVER_BIN_PATH /tmp/big-data-harvest-server-bin.tar.gz
-ADD $REG_MANAGER_IMAGE_PATH /tmp/registry-manager-bin.tar.gz
-RUN  apt-get update -y &&\
-     apt-get install curl -y &&\
-     mkdir /opt/big-data-harvest-server &&\
-     mkdir /opt/registry-manager  &&\
-     tar xzf /tmp/big-data-harvest-server-bin.tar.gz  -C /opt/big-data-harvest-server --strip-components 1 &&\
-     tar xzf /tmp/registry-manager-bin.tar.gz  -C /opt/registry-manager --strip-components 1 &&\
-     rm -f /tmp/big-data-harvest-server-bin.tar.gz &&\
-     rm -f /tmp/registry-manager-bin.tar.gz &&\
-     apt-get autoclean --quiet --yes &&\
-     rm -rf /var/lib/apt/lists/*
-ENV PATH="$PATH:/opt/big-data-harvest-server/bin"
-ENV PATH="$PATH:/opt/registry-manager/bin"
+echo "Creating registry and data dictionary indices..." 1>&2
+registry-manager create-registry -es "$ES_URL"
 
-# Entry point
-COPY ./entrypoint.sh /usr/local/bin/entrypoint.sh
-ENTRYPOINT ["bash", "/usr/local/bin/entrypoint.sh"]
+echo "Starting the Big Data Harvest Server..."  1>&2
+harvest-server -c /cfg/harvest-server.cfg

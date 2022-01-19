@@ -39,11 +39,15 @@
 
 # Update the following environment variables before executing this script
 
+# Elasticsearch URL (E.g.: http://192.168.0.1:9200)
+ES_URL=http://192.168.0.1:9200
+
 # Absolute path for the Big Data Harvest Server configuration file in the host machine (E.g.: /tmp/cfg/harvest-server.cfg)
 HARVEST_SERVER_CONFIG_FILE=/tmp/cfg/harvest-server.cfg
 
-# Absolute path for the Harvest data directory in the host machine (E.g.: /tmp/data/urn-nasa-pds-insight_rad)
-HARVEST_DATA_DIR=/tmp/data
+# Absolute path for the Harvest data directory in the host machine (E.g.: /tmp/big-data-harvest-data/urn-nasa-pds-insight_rad).
+# This directory will get created automatically, if the big-data-harvest-client is executed with the option to download test data.
+HARVEST_DATA_DIR=/tmp/big-data-harvest-data
 
 
 # Check if the Big Data Harvest Server configuration file exists
@@ -65,6 +69,8 @@ fi
 # Execute docker container run to start the Big Data Harvest Server
 docker container run --name big-data-harvest-server \
            --rm \
+           --env ES_URL="${ES_URL}" \
+           -p 8005:8005 \
            --volume "$HARVEST_SERVER_CONFIG_FILE":/cfg/harvest-server.cfg \
            --volume "$HARVEST_DATA_DIR":/data \
            nasapds/big-data-harvest-server
