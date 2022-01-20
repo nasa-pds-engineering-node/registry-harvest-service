@@ -41,15 +41,12 @@ if [ -z "$ES_URL" ]; then
 fi
 
 echo "Waiting for Elasticsearch to launch..."  1>&2
-while ! curl --output /dev/null --silent --head --fail "$ES_URL"; do
+while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' "${ES_URL}"/registry)" != "200" ]]; do
   sleep 1
 done
 
-# TODO
-# The following command with default options is only suitable for a development setup and it is required improve this
-# for production use with more parameters.
-echo "Creating registry and data dictionary indices..." 1>&2
-registry-manager create-registry -es "$ES_URL"
+echo "Waiting for the creation of registry and data dictionary indices..."  1>&2
+sleep 60
 
 echo "Starting the Big Data Harvest Server..."  1>&2
 harvest-server -c /cfg/harvest-server.cfg

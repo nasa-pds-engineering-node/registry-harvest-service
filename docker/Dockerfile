@@ -30,28 +30,21 @@
 
 FROM openjdk:11-slim
 
-# Set the following arguments with compatible versions
+# Set the following argument with a compatible Big Data Harvest Server version
 ARG big_data_harvest_server_version=1.0.0-SNAPSHOT
-ARG reg_manager_version=4.2.0
 
 ENV BIG_DATA_HARVEST_SERVER_BIN_PATH=https://github.com/NASA-PDS/big-data-harvest-server/releases/download/v${big_data_harvest_server_version}/big-data-harvest-${big_data_harvest_server_version}-bin.tar.gz
-ENV REG_MANAGER_IMAGE_PATH=https://github.com/NASA-PDS/pds-registry-mgr-elastic/releases/download/v${reg_manager_version}/registry-manager-${reg_manager_version}-bin.tar.gz
 
 # Install Big Data Harvest Server and Registry Manager
 ADD $BIG_DATA_HARVEST_SERVER_BIN_PATH /tmp/big-data-harvest-server-bin.tar.gz
-ADD $REG_MANAGER_IMAGE_PATH /tmp/registry-manager-bin.tar.gz
 RUN  apt-get update -y &&\
      apt-get install curl -y &&\
      mkdir /opt/big-data-harvest-server &&\
-     mkdir /opt/registry-manager  &&\
      tar xzf /tmp/big-data-harvest-server-bin.tar.gz  -C /opt/big-data-harvest-server --strip-components 1 &&\
-     tar xzf /tmp/registry-manager-bin.tar.gz  -C /opt/registry-manager --strip-components 1 &&\
      rm -f /tmp/big-data-harvest-server-bin.tar.gz &&\
-     rm -f /tmp/registry-manager-bin.tar.gz &&\
      apt-get autoclean --quiet --yes &&\
      rm -rf /var/lib/apt/lists/*
 ENV PATH="$PATH:/opt/big-data-harvest-server/bin"
-ENV PATH="$PATH:/opt/registry-manager/bin"
 
 # Entry point
 COPY ./entrypoint.sh /usr/local/bin/entrypoint.sh
