@@ -45,6 +45,9 @@ while ! curl --output /dev/null --silent --head --fail "$ES_URL"; do
   sleep 1
 done
 
+# TODO
+# The following command with default options is only suitable for a development setup and it is required improve this
+# for production use with more parameters.
 echo "Creating registry and data dictionary indices..." 1>&2
 registry-manager create-registry -es "$ES_URL"
 
