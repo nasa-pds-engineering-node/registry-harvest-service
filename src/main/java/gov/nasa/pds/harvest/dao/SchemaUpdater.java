@@ -11,8 +11,9 @@ import org.apache.logging.log4j.Logger;
 import gov.nasa.pds.harvest.cfg.RegistryCfg;
 import gov.nasa.pds.harvest.dd.LddLoader;
 import gov.nasa.pds.harvest.dd.LddUtils;
-import gov.nasa.pds.harvest.util.ExceptionUtils;
 import gov.nasa.pds.harvest.util.file.FileDownloader;
+import gov.nasa.pds.registry.common.util.ExceptionUtils;
+
 
 /**
  * Update Elasticsearch schema and LDDs

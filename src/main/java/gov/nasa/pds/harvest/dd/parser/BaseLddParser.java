@@ -6,7 +6,7 @@ import java.io.FileReader;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 
-import gov.nasa.pds.harvest.util.CloseUtils;
+import gov.nasa.pds.registry.common.util.CloseUtils;
 
 
 /**

@@ -8,7 +8,7 @@ import org.apache.logging.log4j.Logger;
 import gov.nasa.pds.harvest.cfg.RegistryCfg;
 import gov.nasa.pds.harvest.mq.msg.CollectionInventoryMessage;
 import gov.nasa.pds.harvest.proc.CollectionInventoryProcessor;
-import gov.nasa.pds.harvest.util.ExceptionUtils;
+import gov.nasa.pds.registry.common.util.ExceptionUtils;
 
 /**
  * Consume collection inventory messages

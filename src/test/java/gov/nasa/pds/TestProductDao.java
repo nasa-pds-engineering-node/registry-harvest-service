@@ -1,18 +1,20 @@
 package gov.nasa.pds;
 
+import java.util.Arrays;
 import java.util.List;
 
 import gov.nasa.pds.harvest.cfg.RegistryCfg;
-import gov.nasa.pds.harvest.dao.ProductDao;
 import gov.nasa.pds.harvest.dao.RegistryManager;
 import gov.nasa.pds.harvest.util.Log4jConfigurator;
+import gov.nasa.pds.registry.common.es.dao.ProductDao;
 
 
 public class TestProductDao
 {
     public static void main(String[] args) throws Exception
     {
-        testGetRefDocCount();
+        //testUpdateStatus();
+        testGetRefs();
     }
     
     
@@ -106,6 +108,28 @@ public class TestProductDao
     }
 
     
+    public static void testUpdateStatus() throws Exception
+    {
+        Log4jConfigurator.configure("DEBUG", "/tmp/t.log");
+        RegistryCfg cfg = createConfiguration();
+
+        try
+        {
+            RegistryManager.init(cfg);
+    
+            ProductDao dao = RegistryManager.getInstance().getProductDao();
+            List<String> lidvids = Arrays.asList(
+                    "urn:nasa:pds:orex.spice:spice_kernels:ck_orx_ola_190726_scil2id04650.bc::1.00");
+            
+            dao.updateStatus(lidvids, "archived");
+        }
+        finally
+        {
+            RegistryManager.destroy();
+        }
+    }
+
+    
     private static RegistryCfg createConfiguration()
     {
         RegistryCfg cfg = new RegistryCfg();
@@ -116,25 +140,5 @@ public class TestProductDao
         return cfg;
     }
 
-    
-    private static String escape(String str)
-    {
-        if(str == null) return null;
-        
-        StringBuilder bld = new StringBuilder();
-        for(int i = 0; i < str.length(); i++)
-        {
-            char ch = str.charAt(i);
-            if(ch == ':')
-            {
-                bld.append("\\:");
-            }
-            else
-            {
-                bld.append(ch);
-            }
-        }
-        
-        return bld.toString();
-    }
+
 }

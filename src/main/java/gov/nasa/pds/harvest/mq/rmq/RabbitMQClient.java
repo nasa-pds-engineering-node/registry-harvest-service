@@ -17,8 +17,8 @@ import gov.nasa.pds.harvest.mq.CollectionInventoryConsumer;
 import gov.nasa.pds.harvest.mq.MQClient;
 import gov.nasa.pds.harvest.mq.ManagerCommandConsumer;
 import gov.nasa.pds.harvest.mq.ProductConsumer;
-import gov.nasa.pds.harvest.util.CloseUtils;
-import gov.nasa.pds.harvest.util.ExceptionUtils;
+import gov.nasa.pds.registry.common.util.CloseUtils;
+import gov.nasa.pds.registry.common.util.ExceptionUtils;
 
 
 /**

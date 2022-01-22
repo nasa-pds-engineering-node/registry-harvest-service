@@ -4,8 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.UnknownHostException;
@@ -17,9 +15,10 @@ import org.apache.logging.log4j.Logger;
 
 import com.google.gson.Gson;
 
-import gov.nasa.pds.harvest.util.CloseUtils;
 import gov.nasa.pds.registry.common.es.client.EsUtils;
 import gov.nasa.pds.registry.common.es.client.HttpConnectionFactory;
+import gov.nasa.pds.registry.common.es.dao.DaoUtils;
+import gov.nasa.pds.registry.common.util.CloseUtils;
 
 
 /**
@@ -89,7 +88,7 @@ public class DataLoader
             writer.close();
         
             // Check for Elasticsearch errors.
-            String respJson = getLastLine(con.getInputStream());
+            String respJson = DaoUtils.getLastLine(con.getInputStream());
             log.debug(respJson);
             
             int numErrors = processErrors(respJson);
@@ -108,7 +107,7 @@ public class DataLoader
             if(respCode <= 0) throw ex;
             
             // Try extracting JSON from multi-line error response (last line) 
-            String json = getLastLine(con.getErrorStream());
+            String json = DaoUtils.getLastLine(con.getErrorStream());
             if(json == null) throw ex;
             
             // Parse error JSON to extract reason.
@@ -237,7 +236,7 @@ public class DataLoader
             writer.close();
         
             // Check for Elasticsearch errors.
-            String respJson = getLastLine(con.getInputStream());
+            String respJson = DaoUtils.getLastLine(con.getInputStream());
             log.debug(respJson);
             
             int numErrors = processErrors(respJson);
@@ -256,7 +255,7 @@ public class DataLoader
             if(respCode <= 0) throw ex;
             
             // Try extracting JSON from multi-line error response (last line) 
-            String json = getLastLine(con.getErrorStream());
+            String json = DaoUtils.getLastLine(con.getErrorStream());
             if(json == null) throw ex;
             
             // Parse error JSON to extract reason.
@@ -351,35 +350,4 @@ public class DataLoader
     }
 
     
-    /**
-     * This method is used to parse multi-line Elasticsearch error responses.
-     * JSON error response is on the last line of a message.
-     * @param is input stream
-     * @return Last line
-     */
-    private static String getLastLine(InputStream is)
-    {
-        String lastLine = null;
-
-        try
-        {
-            BufferedReader rd = new BufferedReader(new InputStreamReader(is));
-
-            String line;
-            while((line = rd.readLine()) != null)
-            {
-                lastLine = line;
-            }
-        }
-        catch(Exception ex)
-        {
-            // Ignore
-        }
-        finally
-        {
-            CloseUtils.close(is);
-        }
-        
-        return lastLine;
-    }
 }

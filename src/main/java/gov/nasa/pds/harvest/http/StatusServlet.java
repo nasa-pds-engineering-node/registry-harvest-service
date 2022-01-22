@@ -16,7 +16,7 @@ import com.google.gson.GsonBuilder;
 
 import gov.nasa.pds.harvest.cfg.Configuration;
 import gov.nasa.pds.harvest.mq.MQClient;
-import gov.nasa.pds.harvest.util.ManifestUtils;
+import gov.nasa.pds.registry.common.util.ManifestUtils;
 
 
 /**

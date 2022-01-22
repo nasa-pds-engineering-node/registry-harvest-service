@@ -11,7 +11,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 
 import gov.nasa.pds.harvest.util.Log4jConfigurator;
-import gov.nasa.pds.harvest.util.ManifestUtils;
+import gov.nasa.pds.registry.common.util.ManifestUtils;
 
 
 public class HarvestServerMain
