@@ -16,9 +16,9 @@ import org.w3c.dom.NodeList;
 
 import gov.nasa.pds.harvest.Constants;
 import gov.nasa.pds.harvest.job.Job;
-import gov.nasa.pds.harvest.meta.Metadata;
 import gov.nasa.pds.harvest.util.PdsStringUtils;
-import gov.nasa.pds.harvest.util.xml.XPathUtils;
+import gov.nasa.pds.registry.common.meta.Metadata;
+import gov.nasa.pds.registry.common.util.xml.XPathUtils;
 
 
 /**

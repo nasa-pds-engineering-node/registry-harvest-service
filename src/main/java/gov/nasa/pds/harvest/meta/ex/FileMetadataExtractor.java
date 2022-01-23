@@ -26,8 +26,8 @@ import gov.nasa.pds.harvest.Constants;
 import gov.nasa.pds.harvest.cfg.HarvestCfg;
 import gov.nasa.pds.harvest.job.FileRefCfg;
 import gov.nasa.pds.harvest.job.Job;
-import gov.nasa.pds.harvest.meta.Metadata;
 import gov.nasa.pds.harvest.util.out.FieldNameUtils;
+import gov.nasa.pds.registry.common.meta.Metadata;
 import gov.nasa.pds.registry.common.util.CloseUtils;
 
 /**

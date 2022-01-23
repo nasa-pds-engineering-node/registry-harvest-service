@@ -4,7 +4,7 @@ import java.io.Writer;
 import java.util.Collection;
 import org.apache.commons.lang.StringEscapeUtils;
 
-import gov.nasa.pds.harvest.meta.FieldMapSet;
+import gov.nasa.pds.registry.common.util.FieldMapSet;
 
 
 /**

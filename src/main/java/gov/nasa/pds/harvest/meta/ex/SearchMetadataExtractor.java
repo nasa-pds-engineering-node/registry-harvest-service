@@ -6,7 +6,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import gov.nasa.pds.harvest.meta.FieldMap;
+import gov.nasa.pds.registry.common.util.FieldMap;
 
 
 /**

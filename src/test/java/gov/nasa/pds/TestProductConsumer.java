@@ -7,10 +7,10 @@ import gov.nasa.pds.harvest.cfg.Configuration;
 import gov.nasa.pds.harvest.cfg.RegistryCfg;
 import gov.nasa.pds.harvest.dao.RegistryManager;
 import gov.nasa.pds.harvest.dao.SchemaDao;
-import gov.nasa.pds.harvest.meta.FieldNameCache;
 import gov.nasa.pds.harvest.mq.ProductConsumer;
 import gov.nasa.pds.harvest.mq.msg.ProductMessage;
 import gov.nasa.pds.harvest.util.Log4jConfigurator;
+import gov.nasa.pds.registry.common.meta.FieldNameCache;
 
 
 public class TestProductConsumer

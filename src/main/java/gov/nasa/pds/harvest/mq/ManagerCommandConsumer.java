@@ -66,7 +66,7 @@ public class ManagerCommandConsumer
             try
             {
                 ProductService srv = RegistryManager.getInstance().getProductService();
-                srv.setArchveStatus(lidvid, status);
+                srv.updateArchveStatus(lidvid, status);
             }
             catch(Exception ex)
             {

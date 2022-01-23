@@ -11,7 +11,6 @@ import org.w3c.dom.Document;
 
 import gov.nasa.pds.harvest.cfg.HarvestCfg;
 import gov.nasa.pds.harvest.job.Job;
-import gov.nasa.pds.harvest.meta.Metadata;
 import gov.nasa.pds.harvest.meta.ex.AutogenExtractor;
 import gov.nasa.pds.harvest.meta.ex.BasicMetadataExtractor;
 import gov.nasa.pds.harvest.meta.ex.BundleMetadataExtractor;
@@ -19,8 +18,9 @@ import gov.nasa.pds.harvest.meta.ex.FileMetadataExtractor;
 import gov.nasa.pds.harvest.meta.ex.InternalReferenceExtractor;
 import gov.nasa.pds.harvest.meta.ex.SearchMetadataExtractor;
 import gov.nasa.pds.harvest.util.out.RegistryDocWriter;
-import gov.nasa.pds.harvest.util.xml.XmlDomUtils;
-import gov.nasa.pds.harvest.util.xml.XmlNamespaces;
+import gov.nasa.pds.registry.common.meta.Metadata;
+import gov.nasa.pds.registry.common.util.xml.XmlDomUtils;
+import gov.nasa.pds.registry.common.util.xml.XmlNamespaces;
 
 
 /**

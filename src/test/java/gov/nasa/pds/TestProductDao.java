@@ -121,7 +121,7 @@ public class TestProductDao
             List<String> lidvids = Arrays.asList(
                     "urn:nasa:pds:orex.spice:spice_kernels:ck_orx_ola_190726_scil2id04650.bc::1.00");
             
-            dao.updateStatus(lidvids, "archived");
+            dao.updateArchiveStatus(lidvids, "archived");
         }
         finally
         {

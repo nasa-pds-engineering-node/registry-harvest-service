@@ -10,7 +10,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.google.gson.stream.JsonWriter;
 
-import gov.nasa.pds.harvest.util.LidVidUtils;
+import gov.nasa.pds.registry.common.util.LidVidUtils;
 
 
 /**
