@@ -1,8 +1,8 @@
 # Changelog
 
-## [v1.0.0-SNAPSHOT](https://github.com/NASA-PDS/big-data-harvest-server/tree/v1.0.0-SNAPSHOT) (2022-01-13)
+## [v1.0.0-SNAPSHOT](https://github.com/NASA-PDS/registry-harvest-service/tree/v1.0.0-SNAPSHOT) (2022-01-13)
 
-[Full Changelog](https://github.com/NASA-PDS/big-data-harvest-server/compare/abd845ff6ccdddc2730f4f0b10667e0c58cb7561...v1.0.0-SNAPSHOT)
+[Full Changelog](https://github.com/NASA-PDS/registry-harvest-service/compare/abd845ff6ccdddc2730f4f0b10667e0c58cb7561...v1.0.0-SNAPSHOT)
 
 
 
