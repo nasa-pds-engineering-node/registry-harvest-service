@@ -30,9 +30,9 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-# ------------------------------------------------------------------------------
-# This shell script provides an entrypoint for the Big Data Harvest Server docker image.
-# ------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------
+# This shell script provides an entrypoint for the Registry Harvest Service docker image.
+# ---------------------------------------------------------------------------------------
 
 # Check if the ES_URL environment variable is set
 if [ -z "$ES_URL" ]; then
@@ -48,5 +48,5 @@ done
 echo "Waiting for the creation of registry and data dictionary indices..."  1>&2
 sleep 60
 
-echo "Starting the Big Data Harvest Server..."  1>&2
+echo "Starting the Registry Harvest Service..."  1>&2
 harvest-server -c /cfg/harvest-server.cfg

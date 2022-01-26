@@ -31,7 +31,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 # ----------------------------------------------------------------------------------------------
-# This script is used to start the Big Data Harvest Server docker container with a simple command.
+# This script is used to start the Registry Harvest Service docker container with a simple command.
 #
 # Usage: ./run.sh
 #
@@ -42,22 +42,22 @@
 # Elasticsearch URL (E.g.: http://192.168.0.1:9200)
 ES_URL=http://192.168.0.1:9200
 
-# Absolute path of the Big Data Harvest Server configuration file in the host machine (E.g.: /tmp/cfg/harvest-server.cfg)
+# Absolute path of the Registry Harvest Service configuration file in the host machine (E.g.: /tmp/cfg/harvest-server.cfg)
 HARVEST_SERVER_CONFIG_FILE=/tmp/cfg/harvest-server.cfg
 
-# Absolute path of the Harvest data directory in the host machine (E.g.: `/tmp/big-data-harvest-data`).
-# If the Big Data Harvest Client is executed with the option to download test data, then this directory will be
+# Absolute path of the Harvest data directory in the host machine (E.g.: `/tmp/registry-harvest-data`).
+# If the Registry Harvest CLI is executed with the option to download test data, then this directory will be
 # cleaned-up and populated with test data. Make sure to have the same `HARVEST_DATA_DIR` value set in the
-# environment variables of the Big Data Harvest Server, Big Data Crawler Server and Big Data Harvest Client.
-# Also, this `HARVEST_DATA_DIR` location should be accessible from the docker containers of the Big Data Harvest Server,
-# Big Data Crawler Server and Big Data Harvest Client.
-HARVEST_DATA_DIR=/tmp/big-data-harvest-data
+# environment variables of the Registry Harvest Service, Registry Crawler Server and Registry Harvest CLI.
+# Also, this `HARVEST_DATA_DIR` location should be accessible from the docker containers of the Registry Harvest Service,
+# Registry Crawler Server and Registry Harvest CLI.
+HARVEST_DATA_DIR=/tmp/registry-harvest-data
 
 
-# Check if the Big Data Harvest Server configuration file exists
+# Check if the Registry Harvest Service configuration file exists
 if [ ! -f "$HARVEST_SERVER_CONFIG_FILE" ]; then
-    echo "Error: The Big Data Harvest Server configuration file $HARVEST_SERVER_CONFIG_FILE does not exist." \
-            "Set an absolute file path of an existing Big Data Harvest Server configuration file in the $0 file" \
+    echo "Error: The Registry Harvest Service configuration file $HARVEST_SERVER_CONFIG_FILE does not exist." \
+            "Set an absolute file path of an existing Registry Harvest Service configuration file in the $0 file" \
             "as the environment variable 'HARVEST_SERVER_CONFIG_FILE'." 1>&2
     exit 1
 fi
@@ -70,11 +70,11 @@ if [ ! -d "$HARVEST_DATA_DIR" ]; then
     exit 1
 fi
 
-# Execute docker container run to start the Big Data Harvest Server
-docker container run --name big-data-harvest-server \
+# Execute docker container run to start the Registry Harvest Service
+docker container run --name registry-harvest-service \
            --rm \
            --env ES_URL="${ES_URL}" \
            --publish 8005:8005 \
            --volume "$HARVEST_SERVER_CONFIG_FILE":/cfg/harvest-server.cfg \
            --volume "$HARVEST_DATA_DIR":/data \
-           nasapds/big-data-harvest-server
+           nasapds/registry-harvest-service

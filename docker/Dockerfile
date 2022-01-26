@@ -30,21 +30,21 @@
 
 FROM openjdk:11-slim
 
-# Set the following argument with a compatible Big Data Harvest Server version
-ARG big_data_harvest_server_version=1.0.0-SNAPSHOT
+# Set the following argument with a compatible Registry Harvest Service version
+ARG registry_harvest_service_version=1.0.0-SNAPSHOT
 
-ENV BIG_DATA_HARVEST_SERVER_BIN_PATH=https://github.com/NASA-PDS/big-data-harvest-server/releases/download/v${big_data_harvest_server_version}/big-data-harvest-${big_data_harvest_server_version}-bin.tar.gz
+ENV REGISTRY_HARVEST_SERVICE_BIN_PATH=https://github.com/NASA-PDS/registry-harvest-service/releases/download/v${registry_harvest_service_version}/registry-harvest-service-${registry_harvest_service_version}-bin.tar.gz
 
-# Install Big Data Harvest Server and Registry Manager
-ADD $BIG_DATA_HARVEST_SERVER_BIN_PATH /tmp/big-data-harvest-server-bin.tar.gz
+# Install Registry Harvest Service
+ADD $REGISTRY_HARVEST_SERVICE_BIN_PATH /tmp/registry-harvest-service-bin.tar.gz
 RUN  apt-get update -y &&\
      apt-get install curl -y &&\
-     mkdir /opt/big-data-harvest-server &&\
-     tar xzf /tmp/big-data-harvest-server-bin.tar.gz  -C /opt/big-data-harvest-server --strip-components 1 &&\
-     rm -f /tmp/big-data-harvest-server-bin.tar.gz &&\
+     mkdir /opt/registry-harvest-service &&\
+     tar xzf /tmp/registry-harvest-service-bin.tar.gz  -C /opt/registry-harvest-service --strip-components 1 &&\
+     rm -f /tmp/registry-harvest-service-bin.tar.gz &&\
      apt-get autoclean --quiet --yes &&\
      rm -rf /var/lib/apt/lists/*
-ENV PATH="$PATH:/opt/big-data-harvest-server/bin"
+ENV PATH="$PATH:/opt/registry-harvest-service/bin"
 
 # Entry point
 COPY ./entrypoint.sh /usr/local/bin/entrypoint.sh
