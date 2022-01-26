@@ -53,7 +53,7 @@ HARVEST_HOME=$(cd ${SCRIPT_DIR}/.. && pwd)
 export HARVEST_HOME
 
 # Executable Jar
-TOOL_JARS=(${HARVEST_HOME}/dist/big-data-harvest-*.jar)
+TOOL_JARS=(${HARVEST_HOME}/dist/registry-harvest-service-*.jar)
 TOOL_JAR=${TOOL_JARS[0]}
 
 # Run Harvest

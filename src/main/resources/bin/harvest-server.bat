@@ -41,7 +41,7 @@ popd
 REM Get executable jar. 
 REM NOTE. We can hardcode the version, but have to change the script every release.
 
-FOR /f %%f IN ('dir /b /s "%HARVEST_HOME%\dist\big-data-harvest-*.jar"') DO (
+FOR /f %%f IN ('dir /b /s "%HARVEST_HOME%\dist\registry-harvest-service-*.jar"') DO (
   set "TOOL_JAR=%%~f"
 )
 
