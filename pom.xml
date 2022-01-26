@@ -59,19 +59,19 @@ Go through this file line-by-line and replace the template values with your own.
     </parent>
   
     <properties>
-        <project-name>Big Data Harvest</project-name>
+        <project-name>Registry Harvest Service</project-name>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <log4j.version>2.17.1</log4j.version>
     </properties>
 
     <groupId>gov.nasa.pds</groupId>
-    <artifactId>big-data-harvest</artifactId>
+    <artifactId>registry-harvest-service</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>${project.groupId}:${project-name}</name>
     <description>
-        Put a short paragraph-sized summary of the project here.
+        A scalable web service version of a standalone Harvest tool.
     </description>
 
     <!-- Check the calendar -->
