@@ -1,8 +1,12 @@
 # Changelog
 
-## [v1.0.0-SNAPSHOT](https://github.com/NASA-PDS/registry-harvest-service/tree/v1.0.0-SNAPSHOT) (2022-01-13)
+## [v1.0.0-SNAPSHOT](https://github.com/NASA-PDS/registry-harvest-service/tree/v1.0.0-SNAPSHOT) (2022-01-26)
 
-[Full Changelog](https://github.com/NASA-PDS/registry-harvest-service/compare/abd845ff6ccdddc2730f4f0b10667e0c58cb7561...v1.0.0-SNAPSHOT)
+[Full Changelog](https://github.com/NASA-PDS/registry-harvest-service/compare/v0.1.0...v1.0.0-SNAPSHOT)
+
+## [v0.1.0](https://github.com/NASA-PDS/registry-harvest-service/tree/v0.1.0) (2022-01-25)
+
+[Full Changelog](https://github.com/NASA-PDS/registry-harvest-service/compare/abd845ff6ccdddc2730f4f0b10667e0c58cb7561...v0.1.0)
 
 
 
