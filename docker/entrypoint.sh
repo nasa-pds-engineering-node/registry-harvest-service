@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # Copyright 2022, California Institute of Technology ("Caltech").
 # U.S. Government sponsorship acknowledged.
 #
@@ -28,24 +30,23 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM openjdk:11-slim
+# ---------------------------------------------------------------------------------------
+# This shell script provides an entrypoint for the Registry Harvest Service docker image.
+# ---------------------------------------------------------------------------------------
 
-# Set the following argument with a compatible Registry Harvest Service version
-ARG registry_harvest_service_version=1.0.0-SNAPSHOT
+# Check if the ES_URL environment variable is set
+if [ -z "$ES_URL" ]; then
+    echo "Error: 'ES_URL' (Elasticsearch URL) environment variable is not set. Use docker's -e option." 1>&2
+    exit 1
+fi
 
-ENV REGISTRY_HARVEST_SERVICE_BIN_PATH=https://github.com/NASA-PDS/registry-harvest-service/releases/download/v${registry_harvest_service_version}/registry-harvest-service-${registry_harvest_service_version}-bin.tar.gz
+echo "Waiting for Elasticsearch to launch..."  1>&2
+while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' "${ES_URL}"/registry)" != "200" ]]; do
+  sleep 1
+done
 
-# Install Registry Harvest Service
-ADD $REGISTRY_HARVEST_SERVICE_BIN_PATH /tmp/registry-harvest-service-bin.tar.gz
-RUN  apt-get update -y &&\
-     apt-get install curl -y &&\
-     mkdir /opt/registry-harvest-service &&\
-     tar xzf /tmp/registry-harvest-service-bin.tar.gz  -C /opt/registry-harvest-service --strip-components 1 &&\
-     rm -f /tmp/registry-harvest-service-bin.tar.gz &&\
-     apt-get autoclean --quiet --yes &&\
-     rm -rf /var/lib/apt/lists/*
-ENV PATH="$PATH:/opt/registry-harvest-service/bin"
+echo "Waiting for the creation of registry and data dictionary indices..."  1>&2
+sleep 60
 
-# Entry point
-COPY ./entrypoint.sh /usr/local/bin/entrypoint.sh
-ENTRYPOINT ["bash", "/usr/local/bin/entrypoint.sh"]
+echo "Starting the Registry Harvest Service..."  1>&2
+harvest-server -c /cfg/harvest-server.cfg
