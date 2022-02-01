@@ -66,9 +66,14 @@ public class ProductProcessor
         
         basicExtractor = new BasicMetadataExtractor();
         refExtractor = new InternalReferenceExtractor();
+
         autogenExtractor = new AutogenExtractor();
+        
         searchExtractor = new SearchMetadataExtractor();
+        
         fileDataExtractor = new FileMetadataExtractor();
+        fileDataExtractor.setProcessDataFiles(cfg.processDataFiles);
+        fileDataExtractor.setStoreLabels(cfg.storeLabels, cfg.storeJsonLabels);
         
         bundleExtractor = new BundleMetadataExtractor();
     }
