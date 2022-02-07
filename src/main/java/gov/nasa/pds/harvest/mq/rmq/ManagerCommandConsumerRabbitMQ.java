@@ -12,29 +12,29 @@ import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 
 import gov.nasa.pds.harvest.Constants;
-import gov.nasa.pds.harvest.mq.ProductConsumer;
-import gov.nasa.pds.harvest.mq.msg.ProductMessage;
-
+import gov.nasa.pds.harvest.mq.ManagerCommandConsumer;
+import gov.nasa.pds.harvest.mq.msg.ManagerMessage;
 
 /**
- * A consumer of file messages from a RabbitMQ queue
+ * A RabbitMQ consumer of manager messages
  * @author karpenko
  */
-public class ProductConsumerRabbitMQ extends DefaultConsumer
+public class ManagerCommandConsumerRabbitMQ extends DefaultConsumer
 {
     private Logger log;
     private Gson gson;
     
-    private ProductConsumer prodConsumer;
+    private ManagerCommandConsumer mgrConsumer;
+
     
     /**
      * Constructor
      * @param channel RabbitMQ connection channel
      */
-    public ProductConsumerRabbitMQ(Channel channel, ProductConsumer prodConsumer)
+    public ManagerCommandConsumerRabbitMQ(Channel channel, ManagerCommandConsumer mgrConsumer)
     {
         super(channel);
-        this.prodConsumer = prodConsumer;
+        this.mgrConsumer = mgrConsumer;
         
         log = LogManager.getLogger(this.getClass());        
         gson = new Gson();
@@ -47,7 +47,7 @@ public class ProductConsumerRabbitMQ extends DefaultConsumer
      */
     public void start() throws Exception
     {
-        getChannel().basicConsume(Constants.MQ_PRODUCTS, false, this);
+        getChannel().basicConsume(Constants.MQ_MANAGER_COMMANDS, false, this);
     }
 
     
@@ -56,12 +56,12 @@ public class ProductConsumerRabbitMQ extends DefaultConsumer
             AMQP.BasicProperties properties, byte[] body) throws IOException
     {
         long deliveryTag = envelope.getDeliveryTag();
-        ProductMessage msg = null;
+        ManagerMessage msg = null;
         
         try
         {
             String jsonStr = new String(body);
-            msg = gson.fromJson(jsonStr, ProductMessage.class);            
+            msg = gson.fromJson(jsonStr, ManagerMessage.class);
         }
         catch(Exception ex)
         {
@@ -71,8 +71,8 @@ public class ProductConsumerRabbitMQ extends DefaultConsumer
             getChannel().basicAck(deliveryTag, false);
             return;
         }
-
-        if(prodConsumer.processMessage(msg))
+        
+        if(mgrConsumer.processMessage(msg))
         {
             // ACK message (delete from the queue)
             getChannel().basicAck(deliveryTag, false);
@@ -83,6 +83,5 @@ public class ProductConsumerRabbitMQ extends DefaultConsumer
             getChannel().basicReject(deliveryTag, true);
         }
     }
-    
-    
+
 }

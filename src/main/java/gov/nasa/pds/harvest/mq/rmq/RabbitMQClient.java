@@ -13,9 +13,12 @@ import com.rabbitmq.client.ConnectionFactory;
 
 import gov.nasa.pds.harvest.cfg.IPAddress;
 import gov.nasa.pds.harvest.cfg.RabbitMQCfg;
+import gov.nasa.pds.harvest.mq.CollectionInventoryConsumer;
 import gov.nasa.pds.harvest.mq.MQClient;
-import gov.nasa.pds.harvest.util.CloseUtils;
-import gov.nasa.pds.harvest.util.ExceptionUtils;
+import gov.nasa.pds.harvest.mq.ManagerCommandConsumer;
+import gov.nasa.pds.harvest.mq.ProductConsumer;
+import gov.nasa.pds.registry.common.util.CloseUtils;
+import gov.nasa.pds.registry.common.util.ExceptionUtils;
 
 
 /**
@@ -118,6 +121,11 @@ public class RabbitMQClient implements MQClient
         CollectionInventoryConsumerRabbitMQ inventoryConsumer = createCollectionInventoryConsumer();
         inventoryConsumer.start();
         log.info("Started collection inventory consumer");
+
+        // Start Manager command consumer
+        ManagerCommandConsumerRabbitMQ managerConsumer = createManagerCommandConsumer();
+        managerConsumer.start();
+        log.info("Started manager command consumer");
     }
 
     
@@ -184,6 +192,17 @@ public class RabbitMQClient implements MQClient
         return consumer;
     }
 
+    
+    private ManagerCommandConsumerRabbitMQ createManagerCommandConsumer() throws Exception
+    {
+        Channel channel = rmqConnection.createChannel();
+        channel.basicQos(1);
+        
+        ManagerCommandConsumer genericConsumer = consumerFactory.createManagerCommandConsumer();
+        ManagerCommandConsumerRabbitMQ consumer = new ManagerCommandConsumerRabbitMQ(channel, genericConsumer);
+        return consumer;
+    }
+    
     
     private static void sleepSec(int sec)
     {

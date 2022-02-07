@@ -35,13 +35,13 @@ public class RegistryService
      * and return corresponding file paths.
      * @param msg file message containing a batch of LIDVIDs and
      * corresponding file paths
-     * @return a list of unregistered file paths. In case of an error rturn null.
+     * @return a list of unregistered file paths. In case of an error return null.
      */
     public List<String> getUnregisteredFiles(ProductMessage msg)
     {
         List<String> fileList = new ArrayList<>();
 
-        RegistryDao dao = RegistryManager.getInstance().getRegistryDAO();
+        RegistryDao dao = RegistryManager.getInstance().getRegistryDao();
 
         // Call Elasticsearch to get unregistered products.
         // Retry MAX_RETRIES times on an error.

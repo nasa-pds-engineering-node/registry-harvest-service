@@ -3,6 +3,8 @@ package gov.nasa.pds.harvest.job;
 import java.util.List;
 import java.util.Set;
 
+import gov.nasa.pds.registry.common.meta.cfg.FileRefRule;
+
 
 /**
  * Harvest job configuration parameters (extracted from file message)
@@ -30,5 +32,5 @@ public class Job
     /**
      * List of rules to generate file references.
      */
-    public List<FileRefCfg> fileRefRules;
+    public List<FileRefRule> fileRefRules;
 }

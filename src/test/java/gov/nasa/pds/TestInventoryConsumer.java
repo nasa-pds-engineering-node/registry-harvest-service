@@ -2,8 +2,8 @@ package gov.nasa.pds;
 
 import gov.nasa.pds.harvest.cfg.HarvestCfg;
 import gov.nasa.pds.harvest.cfg.RegistryCfg;
+import gov.nasa.pds.harvest.mq.CollectionInventoryConsumer;
 import gov.nasa.pds.harvest.mq.msg.CollectionInventoryMessage;
-import gov.nasa.pds.harvest.mq.rmq.CollectionInventoryConsumer;
 import gov.nasa.pds.harvest.util.Log4jConfigurator;
 
 

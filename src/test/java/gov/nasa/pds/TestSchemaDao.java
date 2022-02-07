@@ -18,7 +18,7 @@ public class TestSchemaDao
         {
             RegistryManager.init(cfg);
     
-            SchemaDao dao = RegistryManager.getInstance().getSchemaDAO();
+            SchemaDao dao = RegistryManager.getInstance().getSchemaDao();
             LddInfo info = dao.getLddInfo("pds");
             info.debug();
         }

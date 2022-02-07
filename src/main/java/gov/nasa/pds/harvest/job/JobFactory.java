@@ -3,6 +3,7 @@ package gov.nasa.pds.harvest.job;
 import java.util.ArrayList;
 
 import gov.nasa.pds.harvest.mq.msg.ProductMessage;
+import gov.nasa.pds.registry.common.meta.cfg.FileRefRule;
 
 /**
  * Cretaes Job objects
@@ -34,7 +35,7 @@ public class JobFactory
                 String[] tokens = strRule.split("|");
                 if(tokens.length == 2)
                 {
-                    FileRefCfg rule = new FileRefCfg();
+                    FileRefRule rule = new FileRefRule();
                     rule.prefix = tokens[0];
                     rule.replacement = tokens[1];
                     job.fileRefRules.add(rule);

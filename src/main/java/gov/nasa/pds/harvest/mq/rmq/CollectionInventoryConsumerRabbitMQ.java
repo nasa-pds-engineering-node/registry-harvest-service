@@ -12,6 +12,7 @@ import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 
 import gov.nasa.pds.harvest.Constants;
+import gov.nasa.pds.harvest.mq.CollectionInventoryConsumer;
 import gov.nasa.pds.harvest.mq.msg.CollectionInventoryMessage;
 
 
@@ -55,10 +56,22 @@ public class CollectionInventoryConsumerRabbitMQ extends DefaultConsumer
             AMQP.BasicProperties properties, byte[] body) throws IOException
     {
         long deliveryTag = envelope.getDeliveryTag();
-
-        String jsonStr = new String(body);
-        CollectionInventoryMessage msg = gson.fromJson(jsonStr, CollectionInventoryMessage.class);
+        CollectionInventoryMessage msg = null;
         
+        try
+        {
+            String jsonStr = new String(body);
+            msg = gson.fromJson(jsonStr, CollectionInventoryMessage.class);
+        }
+        catch(Exception ex)
+        {
+            log.error("Invalid message", ex);
+
+            // ACK message (delete from the queue)
+            getChannel().basicAck(deliveryTag, false);
+            return;
+        }
+
         if(collectionInventoryConsumer.processMessage(msg))
         {
             // ACK message (delete from the queue)

@@ -5,8 +5,10 @@ import org.apache.logging.log4j.Logger;
 import org.elasticsearch.client.RestClient;
 
 import gov.nasa.pds.harvest.cfg.RegistryCfg;
-import gov.nasa.pds.harvest.util.CloseUtils;
 import gov.nasa.pds.registry.common.es.client.EsClientFactory;
+import gov.nasa.pds.registry.common.es.dao.ProductDao;
+import gov.nasa.pds.registry.common.es.service.ProductService;
+import gov.nasa.pds.registry.common.util.CloseUtils;
 
 
 /**
@@ -16,11 +18,19 @@ import gov.nasa.pds.registry.common.es.client.EsClientFactory;
  */
 public class RegistryManager
 {
+    // Singleton
     private static RegistryManager instance = null;
     
+    // Elasticsearch client
     private RestClient esClient;
+    
+    // DAOs
     private RegistryDao registryDao;
     private SchemaDao schemaDao;
+    private ProductDao productDao;
+    
+    // Services
+    private ProductService productService;
     
     
     /**
@@ -44,8 +54,13 @@ public class RegistryManager
         log.info("Registry URL: " + cfg.url);
         log.info("Registry index: " + indexName);
         
+        // DAOs
         registryDao = new RegistryDao(esClient, indexName);
         schemaDao = new SchemaDao(esClient, indexName);
+        productDao = new ProductDao(esClient, indexName);
+        
+        // Services
+        productService = new ProductService(productDao);
     }
     
     
@@ -86,7 +101,7 @@ public class RegistryManager
      * Get registry DAO object.
      * @return Registry DAO
      */
-    public RegistryDao getRegistryDAO()
+    public RegistryDao getRegistryDao()
     {
         return registryDao;
     }
@@ -96,9 +111,28 @@ public class RegistryManager
      * Get schema DAO object.
      * @return Schema DAO
      */
-    public SchemaDao getSchemaDAO()
+    public SchemaDao getSchemaDao()
     {
         return schemaDao;
     }
 
+    
+    /**
+     * Get product DAO object.
+     * @return Product DAO
+     */
+    public ProductDao getProductDao()
+    {
+        return productDao;
+    }
+
+    
+    /**
+     * Get product service object
+     * @return product service
+     */
+    public ProductService getProductService()
+    {
+        return productService;
+    }
 }

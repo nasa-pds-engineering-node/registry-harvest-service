@@ -20,7 +20,7 @@ import gov.nasa.pds.harvest.http.StatusServlet;
 import gov.nasa.pds.harvest.mq.MQClient;
 import gov.nasa.pds.harvest.mq.rmq.ConsumerFactory;
 import gov.nasa.pds.harvest.mq.rmq.RabbitMQClient;
-import gov.nasa.pds.harvest.util.ExceptionUtils;
+import gov.nasa.pds.registry.common.util.ExceptionUtils;
 
 
 /**
