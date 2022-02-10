@@ -14,10 +14,17 @@ mvn package
 ``` 
 
 ## Documentation
-To create maven documentation site, run the following command:
+
+This project includes documentation web application (maven site).
+The documentation provides PDS Registry architecture overview, 
+installation, and operation instructions.
+
+To build and run local documentation web application execute the following maven command:
 
 ```
 mvn site:run
 ```
 Then open this URL in your web browser `http://localhost:8080`
 
+For more information about running all PDS Registry components in Docker see
+https://github.com/NASA-PDS/registry
