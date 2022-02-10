@@ -1,30 +1,12 @@
-# 🪐 NASA PDS New Java Project Template
+# Harvest Web Service
 
-This repository aims at being a base for new Java repositories used in PDS. It guides developers to ease the initialization of a project and recommends preferred options to standardize developments and ease maintenance. Simply click the <kbd>Use this template</kbd> button ↑ (or use [this hyperlink](https://github.com/NASA-PDS/pds-template-repo-java/generate)).
+Server application providing the functionality for capturing and indexing product metadata into the PDS Registry system. 
+This application is different from the standalone Harvest Tool (see https://github.com/nasa-pds/harvest).
 
-## 🏃 Getting Started With This Template
+It has to be used with other components, such as RabbitMQ message broker, Crawler Server and Harvest Client 
+to enable performant ingestion of large data sets. The description of the full application is available on https://nasa-pds.github.io/registry-harvest-service/ . A facilities to launch the full application (including this components) are provided in the registry repository (see https://github.com/NASA-PDS/registry/tree/main/docker).
 
-See our wiki page for more info on setting up your new repo. You can remove this section once you have completed the necessary start-up steps.
 
-https://github.com/NASA-PDS/nasa-pds.github.io/wiki/Git-and-Github-Guide#creating-a-new-repo
-
-**👉 Important!** You must assign the teams as mentioned on the wiki page above! At a minimum, these are:
-
-| Team                                | Permission |
-| ----------------------------------- | ---------- |
-| `@NASA-PDS/pds-software-committers` | `write`    |
-| `@NASA-PDS/pds-software-pmc`        | `admin`    |
-| `@NASA-PDS/pds-operations`          | `admin`    |
-
----
-
-# My Project
-
-This is the XYZ that does this, that, and the other thing for the Planetary Data System.
-
-Please visit our website at: https://nasa-pds.github.io/pds-my-project
-
-It has useful information for developers and end-users.
 
 * [📀 Installation](#---installation)
 * [💁‍♀️ Usage](#------usage)
@@ -43,12 +25,37 @@ It has useful information for developers and end-users.
 
 ## 📀 Installation
 
-_Installation instructions here_.
+This is a Java application. You need Java 11 JDK and Maven to build it.
+To create a binary distribution (ZIP and TGZ archives) run the following maven command:
+
+```
+mvn package
+``` 
+
+Binary archives (such as "registry-harvest-service-1.0.0-SNAPSHOT-bin.zip") will be created in "target" directory.
+
+Prebuilt binaries are available in https://github.com/NASA-PDS/registry-harvest-service/releases
+
+To install, just extract a binary archive into some folder, such as "/opt/harvest"
 
 
 ## 💁‍♀️ Usage
 
-_Basic usage instructions here_.
+* Go to <install_directory>/bin and run "harvest-server" without any parameters to see usage information.
+
+* This project includes documentation web application (maven site).
+The documentation provides PDS Registry architecture overview, 
+installation, and operation instructions.
+
+To build and run local documentation web application execute the following maven command:
+
+```
+mvn site:run
+```
+Then open this URL in your web browser `http://localhost:8080`
+
+* For more information about running all PDS Registry components in Docker see
+https://github.com/NASA-PDS/registry
 
 
 ## 👥 Contributing
