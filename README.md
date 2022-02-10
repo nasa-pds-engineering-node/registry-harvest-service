@@ -1,9 +1,12 @@
 # Harvest Web Service
 
 Server application providing the functionality for capturing and indexing product metadata into the PDS Registry system. 
-This application is different from the standalone Harvest Tool. 
+This application is different from the standalone Harvest Tool (see https://github.com/nasa-pds/harvest).
+
 It has to be used with other components, such as RabbitMQ message broker, Crawler Server and Harvest Client 
-to enable performant ingestion of large data sets. 
+to enable performant ingestion of large data sets. The description of the full application is available on https://nasa-pds.github.io/registry-harvest-service/ . A facilities to launch the full application (including this components) are provided in the registry repository (see https://github.com/NASA-PDS/registry/tree/main/docker).
+
+
 
 * [📀 Installation](#---installation)
 * [💁‍♀️ Usage](#------usage)
