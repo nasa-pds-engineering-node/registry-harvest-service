@@ -141,7 +141,7 @@ public class RegistryDocWriter
             NDJsonDocUtils.writeField(jw, key, values);
             
             // Check if current Elasticsearch schema has this field.
-            if(!FieldNameCache.getInstance().containsName(key))
+            if(!FieldNameCache.getInstance().schemaContainsField(key))
             {
                 // Update missing fields and XSDs
                 missingFields.add(key);

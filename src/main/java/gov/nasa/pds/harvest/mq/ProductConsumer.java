@@ -7,16 +7,19 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import gov.nasa.pds.harvest.cfg.HarvestCfg;
-import gov.nasa.pds.harvest.cfg.RegistryCfg;
-import gov.nasa.pds.harvest.dao.DataLoader;
+import gov.nasa.pds.harvest.dao.RegistryManager;
 import gov.nasa.pds.harvest.dao.RegistryService;
-import gov.nasa.pds.harvest.dao.SchemaUpdater;
 import gov.nasa.pds.harvest.dao.SchemaUtils;
 import gov.nasa.pds.harvest.job.Job;
 import gov.nasa.pds.harvest.job.JobFactory;
 import gov.nasa.pds.harvest.mq.msg.ProductMessage;
 import gov.nasa.pds.harvest.proc.ProductProcessor;
 import gov.nasa.pds.harvest.util.out.RegistryDocWriter;
+import gov.nasa.pds.registry.common.cfg.RegistryCfg;
+import gov.nasa.pds.registry.common.es.dao.DataLoader;
+import gov.nasa.pds.registry.common.es.dao.dd.DataDictionaryDao;
+import gov.nasa.pds.registry.common.es.dao.schema.SchemaDao;
+import gov.nasa.pds.registry.common.es.service.SchemaUpdater;
 import gov.nasa.pds.registry.common.util.ExceptionUtils;
 
 
@@ -52,7 +55,11 @@ public class ProductConsumer
         proc = new ProductProcessor(harvestCfg, registryDocWriter);
         
         dataLoader = new DataLoader(registryCfg.url, registryCfg.indexName, registryCfg.authFile);
-        schemaUpdater = new SchemaUpdater(registryCfg);
+        
+        SchemaDao schemaDao = RegistryManager.getInstance().getSchemaDao();
+        DataDictionaryDao ddDao = RegistryManager.getInstance().getDataDictionaryDao();
+
+        schemaUpdater = new SchemaUpdater(registryCfg, ddDao, schemaDao);
     }
     
     

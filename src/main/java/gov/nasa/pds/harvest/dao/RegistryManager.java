@@ -4,9 +4,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.client.RestClient;
 
-import gov.nasa.pds.harvest.cfg.RegistryCfg;
+import gov.nasa.pds.registry.common.cfg.RegistryCfg;
 import gov.nasa.pds.registry.common.es.client.EsClientFactory;
 import gov.nasa.pds.registry.common.es.dao.ProductDao;
+import gov.nasa.pds.registry.common.es.dao.dd.DataDictionaryDao;
+import gov.nasa.pds.registry.common.es.dao.schema.SchemaDao;
 import gov.nasa.pds.registry.common.es.service.ProductService;
 import gov.nasa.pds.registry.common.util.CloseUtils;
 
@@ -27,6 +29,7 @@ public class RegistryManager
     // DAOs
     private RegistryDao registryDao;
     private SchemaDao schemaDao;
+    private DataDictionaryDao ddDao;
     private ProductDao productDao;
     
     // Services
@@ -57,6 +60,7 @@ public class RegistryManager
         // DAOs
         registryDao = new RegistryDao(esClient, indexName);
         schemaDao = new SchemaDao(esClient, indexName);
+        ddDao = new DataDictionaryDao(esClient, indexName);
         productDao = new ProductDao(esClient, indexName);
         
         // Services
@@ -114,6 +118,16 @@ public class RegistryManager
     public SchemaDao getSchemaDao()
     {
         return schemaDao;
+    }
+
+
+    /**
+     * Get data dictionary DAO object.
+     * @return Schema DAO
+     */
+    public DataDictionaryDao getDataDictionaryDao()
+    {
+        return ddDao;
     }
 
     

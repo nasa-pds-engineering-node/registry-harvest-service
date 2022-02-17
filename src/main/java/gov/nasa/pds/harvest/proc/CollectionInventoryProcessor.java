@@ -7,11 +7,11 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import gov.nasa.pds.harvest.cfg.RegistryCfg;
-import gov.nasa.pds.harvest.dao.DataLoader;
 import gov.nasa.pds.harvest.util.out.InventoryBatchReader;
 import gov.nasa.pds.harvest.util.out.ProdRefsBatch;
 import gov.nasa.pds.harvest.util.out.RefType;
+import gov.nasa.pds.registry.common.cfg.RegistryCfg;
+import gov.nasa.pds.registry.common.es.dao.DataLoader;
 import gov.nasa.pds.registry.common.util.CloseUtils;
 import gov.nasa.pds.harvest.util.out.InventoryDocWriter;
 

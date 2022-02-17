@@ -5,9 +5,9 @@ import java.io.File;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import gov.nasa.pds.harvest.cfg.RegistryCfg;
 import gov.nasa.pds.harvest.mq.msg.CollectionInventoryMessage;
 import gov.nasa.pds.harvest.proc.CollectionInventoryProcessor;
+import gov.nasa.pds.registry.common.cfg.RegistryCfg;
 import gov.nasa.pds.registry.common.util.ExceptionUtils;
 
 /**

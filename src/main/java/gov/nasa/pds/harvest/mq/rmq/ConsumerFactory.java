@@ -1,10 +1,10 @@
 package gov.nasa.pds.harvest.mq.rmq;
 
 import gov.nasa.pds.harvest.cfg.HarvestCfg;
-import gov.nasa.pds.harvest.cfg.RegistryCfg;
 import gov.nasa.pds.harvest.mq.CollectionInventoryConsumer;
 import gov.nasa.pds.harvest.mq.ManagerCommandConsumer;
 import gov.nasa.pds.harvest.mq.ProductConsumer;
+import gov.nasa.pds.registry.common.cfg.RegistryCfg;
 
 /**
  * Creates product and collection inventory consumers
