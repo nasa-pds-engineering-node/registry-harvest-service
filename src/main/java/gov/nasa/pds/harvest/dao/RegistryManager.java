@@ -10,6 +10,7 @@ import gov.nasa.pds.registry.common.es.dao.ProductDao;
 import gov.nasa.pds.registry.common.es.dao.dd.DataDictionaryDao;
 import gov.nasa.pds.registry.common.es.dao.schema.SchemaDao;
 import gov.nasa.pds.registry.common.es.service.ProductService;
+import gov.nasa.pds.registry.common.meta.FieldNameCache;
 import gov.nasa.pds.registry.common.util.CloseUtils;
 
 
@@ -33,7 +34,8 @@ public class RegistryManager
     private ProductDao productDao;
     
     // Services
-    private ProductService productService;
+    private ProductService productService;    
+    private FieldNameCache fieldNameCache;
     
     
     /**
@@ -65,6 +67,7 @@ public class RegistryManager
         
         // Services
         productService = new ProductService(productDao);
+        fieldNameCache = new FieldNameCache(ddDao, schemaDao);
     }
     
     
@@ -149,4 +152,15 @@ public class RegistryManager
     {
         return productService;
     }
+
+
+    /**
+     * Get Field name cache
+     * @return Schema DAO
+     */
+    public FieldNameCache getFieldNameCache()
+    {
+        return fieldNameCache;
+    }
+
 }

@@ -9,7 +9,6 @@ import org.apache.logging.log4j.Logger;
 import gov.nasa.pds.harvest.cfg.HarvestCfg;
 import gov.nasa.pds.harvest.dao.RegistryManager;
 import gov.nasa.pds.harvest.dao.RegistryService;
-import gov.nasa.pds.harvest.dao.SchemaUtils;
 import gov.nasa.pds.harvest.job.Job;
 import gov.nasa.pds.harvest.job.JobFactory;
 import gov.nasa.pds.harvest.mq.msg.ProductMessage;
@@ -128,7 +127,7 @@ public class ProductConsumer
                 // Update schema
                 schemaUpdater.updateSchema(registryDocWriter.getMissingFields(), registryDocWriter.getMissingXsds());
                 // Update cache
-                SchemaUtils.updateFieldsCache();
+                RegistryManager.getInstance().getFieldNameCache().update();
             }
             catch(Exception ex)
             {

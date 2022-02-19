@@ -12,7 +12,7 @@ import java.util.Set;
 import com.google.gson.stream.JsonWriter;
 
 import gov.nasa.pds.harvest.Constants;
-import gov.nasa.pds.registry.common.meta.FieldNameCache;
+import gov.nasa.pds.harvest.dao.RegistryManager;
 import gov.nasa.pds.registry.common.meta.Metadata;
 import gov.nasa.pds.registry.common.util.FieldMap;
 import gov.nasa.pds.registry.common.util.xml.XmlNamespaces;
@@ -141,7 +141,7 @@ public class RegistryDocWriter
             NDJsonDocUtils.writeField(jw, key, values);
             
             // Check if current Elasticsearch schema has this field.
-            if(!FieldNameCache.getInstance().schemaContainsField(key))
+            if(!RegistryManager.getInstance().getFieldNameCache().schemaContainsField(key))
             {
                 // Update missing fields and XSDs
                 missingFields.add(key);
