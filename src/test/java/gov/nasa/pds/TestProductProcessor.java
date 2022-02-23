@@ -6,7 +6,8 @@ import java.util.List;
 import gov.nasa.pds.harvest.cfg.HarvestCfg;
 import gov.nasa.pds.harvest.job.Job;
 import gov.nasa.pds.harvest.proc.ProductProcessor;
-import gov.nasa.pds.harvest.util.out.RegistryDocWriter;
+import gov.nasa.pds.registry.common.util.doc.RegistryDocWriter;
+
 
 public class TestProductProcessor
 {

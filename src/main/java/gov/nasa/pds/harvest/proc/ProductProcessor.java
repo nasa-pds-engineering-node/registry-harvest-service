@@ -10,15 +10,18 @@ import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 
 import gov.nasa.pds.harvest.cfg.HarvestCfg;
+import gov.nasa.pds.harvest.dao.RegistryManager;
 import gov.nasa.pds.harvest.job.Job;
-import gov.nasa.pds.harvest.util.out.RegistryDocWriter;
+import gov.nasa.pds.registry.common.es.service.MissingFieldsProcessor;
 import gov.nasa.pds.registry.common.meta.AutogenExtractor;
 import gov.nasa.pds.registry.common.meta.BasicMetadataExtractor;
 import gov.nasa.pds.registry.common.meta.BundleMetadataExtractor;
 import gov.nasa.pds.registry.common.meta.FileMetadataExtractor;
 import gov.nasa.pds.registry.common.meta.InternalReferenceExtractor;
 import gov.nasa.pds.registry.common.meta.Metadata;
+import gov.nasa.pds.registry.common.meta.MetadataNormalizer;
 import gov.nasa.pds.registry.common.meta.SearchMetadataExtractor;
+import gov.nasa.pds.registry.common.util.doc.RegistryDocWriter;
 import gov.nasa.pds.registry.common.util.xml.XmlDomUtils;
 import gov.nasa.pds.registry.common.util.xml.XmlNamespaces;
 
@@ -45,6 +48,9 @@ public class ProductProcessor
     private AutogenExtractor autogenExtractor;
     private SearchMetadataExtractor searchExtractor;
     private FileMetadataExtractor fileDataExtractor;
+
+    private MissingFieldsProcessor mfProc;
+    private MetadataNormalizer metaNormalizer;
 
     private RegistryDocWriter writer;
     
@@ -76,6 +82,11 @@ public class ProductProcessor
         fileDataExtractor.setStoreLabels(cfg.storeLabels, cfg.storeJsonLabels);
         
         bundleExtractor = new BundleMetadataExtractor();
+        
+        // Services
+        RegistryManager mgr = RegistryManager.getInstance();        
+        mfProc = mgr.createMissingFieldsProcessor();
+        metaNormalizer = mgr.createMetadataNormalizer();
     }
 
     
@@ -134,8 +145,13 @@ public class ProductProcessor
         // Extract file data
         fileDataExtractor.extract(file, meta, job.fileRefRules);
 
+        // Process missing fields
+        mfProc.processDoc(meta.fields, nsInfo);
+        // Fix (normalize) date and boolean field values
+        metaNormalizer.normalizeValues(meta.fields);
+
         // Write metadata
-        writer.write(meta, nsInfo, job.jobId);
+        writer.write(meta, job.jobId);
     }
 
     
@@ -148,5 +164,5 @@ public class ProductProcessor
             bundleExtractor.addRefs(meta.intRefs, bme);
         }
     }
-
+    
 }
