@@ -13,7 +13,7 @@ import com.rabbitmq.client.Envelope;
 
 import gov.nasa.pds.harvest.Constants;
 import gov.nasa.pds.harvest.mq.CollectionInventoryConsumer;
-import gov.nasa.pds.harvest.mq.msg.CollectionInventoryMessage;
+import gov.nasa.pds.registry.common.mq.msg.CollectionInventoryMessage;
 
 
 /**

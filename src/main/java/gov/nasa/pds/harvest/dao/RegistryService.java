@@ -7,8 +7,8 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import gov.nasa.pds.harvest.mq.msg.ProductMessage;
 import gov.nasa.pds.harvest.util.ThreadUtils;
+import gov.nasa.pds.registry.common.mq.msg.ProductMessage;
 
 /**
  * Process File messages from a message queue.

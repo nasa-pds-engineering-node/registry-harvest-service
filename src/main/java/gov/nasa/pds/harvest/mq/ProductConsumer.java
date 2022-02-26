@@ -10,10 +10,10 @@ import gov.nasa.pds.harvest.cfg.HarvestCfg;
 import gov.nasa.pds.harvest.dao.RegistryService;
 import gov.nasa.pds.harvest.job.Job;
 import gov.nasa.pds.harvest.job.JobFactory;
-import gov.nasa.pds.harvest.mq.msg.ProductMessage;
 import gov.nasa.pds.harvest.proc.ProductProcessor;
 import gov.nasa.pds.registry.common.cfg.RegistryCfg;
 import gov.nasa.pds.registry.common.es.dao.DataLoader;
+import gov.nasa.pds.registry.common.mq.msg.ProductMessage;
 import gov.nasa.pds.registry.common.util.ExceptionUtils;
 import gov.nasa.pds.registry.common.util.doc.RegistryDocWriter;
 

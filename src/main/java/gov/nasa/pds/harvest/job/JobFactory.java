@@ -2,8 +2,8 @@ package gov.nasa.pds.harvest.job;
 
 import java.util.ArrayList;
 
-import gov.nasa.pds.harvest.mq.msg.ProductMessage;
 import gov.nasa.pds.registry.common.meta.cfg.FileRefRule;
+import gov.nasa.pds.registry.common.mq.msg.ProductMessage;
 
 /**
  * Cretaes Job objects
@@ -23,7 +23,6 @@ public class JobFactory
         
         job.jobId = msg.jobId;
         job.nodeName = msg.nodeName;
-        job.dateFields = msg.dateFields;
 
         // File reference rules
         if(msg.fileRefRules != null && !msg.fileRefRules.isEmpty())

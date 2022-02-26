@@ -13,7 +13,8 @@ import com.rabbitmq.client.Envelope;
 
 import gov.nasa.pds.harvest.Constants;
 import gov.nasa.pds.harvest.mq.ManagerCommandConsumer;
-import gov.nasa.pds.harvest.mq.msg.ManagerMessage;
+import gov.nasa.pds.registry.common.mq.msg.ManagerMessage;
+
 
 /**
  * A RabbitMQ consumer of manager messages
