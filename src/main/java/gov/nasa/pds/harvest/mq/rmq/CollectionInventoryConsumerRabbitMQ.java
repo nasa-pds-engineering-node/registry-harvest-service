@@ -11,9 +11,9 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 
-import gov.nasa.pds.harvest.Constants;
 import gov.nasa.pds.harvest.mq.CollectionInventoryConsumer;
 import gov.nasa.pds.registry.common.mq.msg.CollectionInventoryMessage;
+import gov.nasa.pds.registry.common.mq.msg.MQConstants;
 
 
 /**
@@ -47,7 +47,7 @@ public class CollectionInventoryConsumerRabbitMQ extends DefaultConsumer
      */
     public void start() throws Exception
     {
-        getChannel().basicConsume(Constants.MQ_COLLECTION_INVENTORY, false, this);
+        getChannel().basicConsume(MQConstants.MQ_COLLECTION_INVENTORY, false, this);
     }
 
     
