@@ -40,8 +40,9 @@ if [ -z "$ES_URL" ]; then
     exit 1
 fi
 
-echo "Waiting for Elasticsearch to launch..."  1>&2
-while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' "${ES_URL}"/registry)" != "200" ]]; do
+echo "Waiting for Elasticsearch registry path to be available..."  1>&2
+# TODO Warning: Use the default username and password only for testing purposes in local setup
+while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' "${ES_URL}"/registry  -u 'admin:admin' --insecure)" != "200" ]]; do
   sleep 1
 done
 
