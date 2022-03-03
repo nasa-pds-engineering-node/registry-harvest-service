@@ -12,14 +12,13 @@ import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
 import gov.nasa.pds.harvest.cfg.Configuration;
 import gov.nasa.pds.harvest.cfg.ConfigurationReader;
-import gov.nasa.pds.harvest.cfg.RegistryCfg;
 import gov.nasa.pds.harvest.dao.RegistryManager;
-import gov.nasa.pds.harvest.dao.SchemaUtils;
 import gov.nasa.pds.harvest.http.MemoryServlet;
 import gov.nasa.pds.harvest.http.StatusServlet;
 import gov.nasa.pds.harvest.mq.MQClient;
 import gov.nasa.pds.harvest.mq.rmq.ConsumerFactory;
 import gov.nasa.pds.harvest.mq.rmq.RabbitMQClient;
+import gov.nasa.pds.registry.common.cfg.RegistryCfg;
 import gov.nasa.pds.registry.common.util.ExceptionUtils;
 
 
@@ -106,7 +105,7 @@ public class HarvestServer
     private void initRegistry(RegistryCfg cfg) throws Exception
     {
         RegistryManager.init(cfg);
-        SchemaUtils.updateFieldsCache();
+        RegistryManager.getInstance().getFieldNameCache().update();
     }
     
     

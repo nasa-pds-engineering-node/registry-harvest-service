@@ -3,11 +3,11 @@ package gov.nasa.pds;
 import java.util.Arrays;
 import java.util.List;
 
-import gov.nasa.pds.harvest.cfg.RegistryCfg;
 import gov.nasa.pds.harvest.dao.RegistryManager;
 import gov.nasa.pds.harvest.dao.RegistryService;
-import gov.nasa.pds.harvest.mq.msg.ProductMessage;
 import gov.nasa.pds.harvest.util.Log4jConfigurator;
+import gov.nasa.pds.registry.common.cfg.RegistryCfg;
+import gov.nasa.pds.registry.common.mq.msg.ProductMessage;
 
 
 public class TestRegistryService

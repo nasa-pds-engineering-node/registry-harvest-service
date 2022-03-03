@@ -7,17 +7,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import gov.nasa.pds.harvest.cfg.HarvestCfg;
-import gov.nasa.pds.harvest.cfg.RegistryCfg;
-import gov.nasa.pds.harvest.dao.DataLoader;
 import gov.nasa.pds.harvest.dao.RegistryService;
-import gov.nasa.pds.harvest.dao.SchemaUpdater;
-import gov.nasa.pds.harvest.dao.SchemaUtils;
 import gov.nasa.pds.harvest.job.Job;
 import gov.nasa.pds.harvest.job.JobFactory;
-import gov.nasa.pds.harvest.mq.msg.ProductMessage;
 import gov.nasa.pds.harvest.proc.ProductProcessor;
-import gov.nasa.pds.harvest.util.out.RegistryDocWriter;
+import gov.nasa.pds.registry.common.cfg.RegistryCfg;
+import gov.nasa.pds.registry.common.es.dao.DataLoader;
+import gov.nasa.pds.registry.common.mq.msg.ProductMessage;
 import gov.nasa.pds.registry.common.util.ExceptionUtils;
+import gov.nasa.pds.registry.common.util.doc.RegistryDocWriter;
 
 
 /**
@@ -33,7 +31,6 @@ public class ProductConsumer
     private RegistryDocWriter registryDocWriter;
     private ProductProcessor proc;
     private DataLoader dataLoader;
-    private SchemaUpdater schemaUpdater;
 
     
     /**
@@ -52,7 +49,6 @@ public class ProductConsumer
         proc = new ProductProcessor(harvestCfg, registryDocWriter);
         
         dataLoader = new DataLoader(registryCfg.url, registryCfg.indexName, registryCfg.authFile);
-        schemaUpdater = new SchemaUpdater(registryCfg);
     }
     
     
@@ -112,32 +108,7 @@ public class ProductConsumer
                 // Ignore this file
             }
         }
-        
-        // Update Elasticsearch schema if needed
-        if(!registryDocWriter.getMissingFields().isEmpty())
-        {
-            try
-            {
-                // Update schema
-                schemaUpdater.updateSchema(registryDocWriter.getMissingFields(), registryDocWriter.getMissingXsds());
-                // Update cache
-                SchemaUtils.updateFieldsCache();
-            }
-            catch(Exception ex)
-            {
-                log.error("Could not update Elasticsearch schema. " + ExceptionUtils.getMessage(ex));
-
-                // Ignore the whole batch for now
-                log.error("Following files will not be processed:");
-                for(String file: filesToProcess)
-                {
-                    log.error(file);
-                }
                 
-                return true;
-            }
-        }
-        
         // Load the data into Elasticsearch
         try
         {

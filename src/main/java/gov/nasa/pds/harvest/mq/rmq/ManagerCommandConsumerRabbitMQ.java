@@ -11,9 +11,10 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 
-import gov.nasa.pds.harvest.Constants;
 import gov.nasa.pds.harvest.mq.ManagerCommandConsumer;
-import gov.nasa.pds.harvest.mq.msg.ManagerMessage;
+import gov.nasa.pds.registry.common.mq.msg.MQConstants;
+import gov.nasa.pds.registry.common.mq.msg.ManagerMessage;
+
 
 /**
  * A RabbitMQ consumer of manager messages
@@ -47,7 +48,7 @@ public class ManagerCommandConsumerRabbitMQ extends DefaultConsumer
      */
     public void start() throws Exception
     {
-        getChannel().basicConsume(Constants.MQ_MANAGER_COMMANDS, false, this);
+        getChannel().basicConsume(MQConstants.MQ_MANAGER_COMMANDS, false, this);
     }
 
     

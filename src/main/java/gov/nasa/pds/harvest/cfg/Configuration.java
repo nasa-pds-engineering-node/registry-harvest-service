@@ -1,5 +1,6 @@
 package gov.nasa.pds.harvest.cfg;
 
+import gov.nasa.pds.registry.common.cfg.RegistryCfg;
 
 /**
  * Harvest server configuration

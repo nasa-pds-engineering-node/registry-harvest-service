@@ -5,9 +5,11 @@ import java.io.File;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import gov.nasa.pds.harvest.cfg.RegistryCfg;
-import gov.nasa.pds.harvest.mq.msg.CollectionInventoryMessage;
-import gov.nasa.pds.harvest.proc.CollectionInventoryProcessor;
+import gov.nasa.pds.harvest.dao.RegistryDao;
+import gov.nasa.pds.harvest.dao.RegistryManager;
+import gov.nasa.pds.registry.common.cfg.RegistryCfg;
+import gov.nasa.pds.registry.common.es.service.CollectionInventoryWriter;
+import gov.nasa.pds.registry.common.mq.msg.CollectionInventoryMessage;
 import gov.nasa.pds.registry.common.util.ExceptionUtils;
 
 /**
@@ -17,7 +19,7 @@ import gov.nasa.pds.registry.common.util.ExceptionUtils;
 public class CollectionInventoryConsumer
 {
     protected Logger log;
-    private CollectionInventoryProcessor proc;
+    private CollectionInventoryWriter proc;
     
     
     /**
@@ -28,7 +30,7 @@ public class CollectionInventoryConsumer
     public CollectionInventoryConsumer(RegistryCfg cfg) throws Exception
     {
         log = LogManager.getLogger(this.getClass());
-        proc = new CollectionInventoryProcessor(cfg);
+        proc = new CollectionInventoryWriter(cfg);
     }
     
     
@@ -51,6 +53,26 @@ public class CollectionInventoryConsumer
             return true;
         }
         
+        if(!msg.overwrite)
+        {
+            // Check if this collection already registered
+            RegistryDao regDao = RegistryManager.getInstance().getRegistryDao();
+            try
+            {
+                if(regDao.idExists(msg.collectionLidvid))
+                {
+                    return true;
+                }
+            }
+            catch(Exception ex)
+            {
+                log.error("Could not determine if a collection '" + msg.collectionLidvid 
+                        + "' already registered. Ignoring collection inventory. " + ExceptionUtils.getMessage(ex));
+                return true;
+            }
+        }
+        
+        // Process collection inventory
         File inventoryFile = new File(msg.inventoryFile);
         if(!inventoryFile.exists())
         {

@@ -1,16 +1,13 @@
 package gov.nasa.pds;
 
 import java.util.Arrays;
-import java.util.Set;
 
 import gov.nasa.pds.harvest.cfg.Configuration;
-import gov.nasa.pds.harvest.cfg.RegistryCfg;
 import gov.nasa.pds.harvest.dao.RegistryManager;
-import gov.nasa.pds.harvest.dao.SchemaDao;
 import gov.nasa.pds.harvest.mq.ProductConsumer;
-import gov.nasa.pds.harvest.mq.msg.ProductMessage;
 import gov.nasa.pds.harvest.util.Log4jConfigurator;
-import gov.nasa.pds.registry.common.meta.FieldNameCache;
+import gov.nasa.pds.registry.common.cfg.RegistryCfg;
+import gov.nasa.pds.registry.common.mq.msg.ProductMessage;
 
 
 public class TestProductConsumer
@@ -39,10 +36,7 @@ public class TestProductConsumer
     private static void initRegistry(RegistryCfg cfg) throws Exception
     {
         RegistryManager.init(cfg);
-
-        SchemaDao schemaDao = RegistryManager.getInstance().getSchemaDao();
-        Set<String> fields = schemaDao.getFieldNames();
-        FieldNameCache.getInstance().set(fields);
+        RegistryManager.getInstance().getFieldNameCache().update();
     }
     
     
