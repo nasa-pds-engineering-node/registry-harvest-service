@@ -31,14 +31,11 @@ public class JobFactory
             
             for(String strRule: msg.fileRefRules)
             {
-                String[] tokens = strRule.split("|");
-                if(tokens.length == 2)
-                {
-                    FileRefRule rule = new FileRefRule();
-                    rule.prefix = tokens[0];
-                    rule.replacement = tokens[1];
-                    job.fileRefRules.add(rule);
-                }
+                String[] tokens = strRule.split("\\|", 2);
+                FileRefRule rule = new FileRefRule();
+                rule.prefix = tokens[0];
+                rule.replacement = tokens[1];
+                job.fileRefRules.add(rule);
             }
         }
         
