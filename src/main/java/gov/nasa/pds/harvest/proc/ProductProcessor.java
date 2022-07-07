@@ -143,6 +143,7 @@ public class ProductProcessor
         searchExtractor.extract(doc, meta.fields);
 
         // Extract file data
+        log.info("Extract metadata with rule " + job.fileRefRules.get(0).prefix);
         fileDataExtractor.extract(file, meta, job.fileRefRules);
 
         // Process missing fields
