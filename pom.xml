@@ -158,7 +158,7 @@ Go through this file line-by-line and replace the template values with your own.
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>9.4.44.v20210927</version>
+            <version>10.0.10</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
