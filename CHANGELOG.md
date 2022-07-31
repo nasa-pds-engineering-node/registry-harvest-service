@@ -1,6 +1,14 @@
 # Changelog
 
-## [v1.0.1-SNAPSHOT](https://github.com/NASA-PDS/registry-harvest-service/tree/v1.0.1-SNAPSHOT) (2022-07-07)
+## [v1.0.1](https://github.com/NASA-PDS/registry-harvest-service/tree/v1.0.1) (2022-07-25)
+
+[Full Changelog](https://github.com/NASA-PDS/registry-harvest-service/compare/v1.0.1-SNAPSHOT...v1.0.1)
+
+**Other closed issues:**
+
+- Update harvest client to support ability to update archive status [\#12](https://github.com/NASA-PDS/registry-harvest-service/issues/12)
+
+## [v1.0.1-SNAPSHOT](https://github.com/NASA-PDS/registry-harvest-service/tree/v1.0.1-SNAPSHOT) (2022-07-13)
 
 [Full Changelog](https://github.com/NASA-PDS/registry-harvest-service/compare/v1.0.0...v1.0.1-SNAPSHOT)
 
