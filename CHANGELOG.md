@@ -1,16 +1,28 @@
 # Changelog
 
+## [1.1.0](https://github.com/NASA-PDS/registry-harvest-service/tree/1.1.0) (2022-10-26)
+
+[Full Changelog](https://github.com/NASA-PDS/registry-harvest-service/compare/release/1.1.0...1.1.0)
+
+**Defects:**
+
+- Harvest service sometimes skips collection inventory files [\#25](https://github.com/NASA-PDS/registry-harvest-service/issues/25) [[s.high](https://github.com/NASA-PDS/registry-harvest-service/labels/s.high)]
+
+## [release/1.1.0](https://github.com/NASA-PDS/registry-harvest-service/tree/release/1.1.0) (2022-09-06)
+
+[Full Changelog](https://github.com/NASA-PDS/registry-harvest-service/compare/v1.1.0-SNAPSHOT...release/1.1.0)
+
+## [v1.1.0-SNAPSHOT](https://github.com/NASA-PDS/registry-harvest-service/tree/v1.1.0-SNAPSHOT) (2022-09-06)
+
+[Full Changelog](https://github.com/NASA-PDS/registry-harvest-service/compare/v1.0.1...v1.1.0-SNAPSHOT)
+
 ## [v1.0.1](https://github.com/NASA-PDS/registry-harvest-service/tree/v1.0.1) (2022-07-25)
 
-[Full Changelog](https://github.com/NASA-PDS/registry-harvest-service/compare/v1.0.1-SNAPSHOT...v1.0.1)
+[Full Changelog](https://github.com/NASA-PDS/registry-harvest-service/compare/v1.0.0...v1.0.1)
 
 **Other closed issues:**
 
 - Update harvest client to support ability to update archive status [\#12](https://github.com/NASA-PDS/registry-harvest-service/issues/12)
-
-## [v1.0.1-SNAPSHOT](https://github.com/NASA-PDS/registry-harvest-service/tree/v1.0.1-SNAPSHOT) (2022-07-13)
-
-[Full Changelog](https://github.com/NASA-PDS/registry-harvest-service/compare/v1.0.0...v1.0.1-SNAPSHOT)
 
 ## [v1.0.0](https://github.com/NASA-PDS/registry-harvest-service/tree/v1.0.0) (2022-04-13)
 
