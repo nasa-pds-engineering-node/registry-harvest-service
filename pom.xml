@@ -169,7 +169,7 @@ Go through this file line-by-line and replace the template values with your own.
         <dependency>
             <groupId>gov.nasa.pds</groupId>
             <artifactId>registry-common</artifactId>
-            <version>1.3.0</version>
+            <version>1.4.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
