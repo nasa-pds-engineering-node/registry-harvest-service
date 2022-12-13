@@ -31,7 +31,7 @@
 FROM openjdk:11-slim
 
 # Set the following argument with a compatible Registry Harvest Service version
-ARG registry_harvest_service_version=1.2.0-SNAPSHOT
+ARG registry_harvest_service_version=1.1.3
 
 ENV REGISTRY_HARVEST_SERVICE_BIN_PATH=https://github.com/NASA-PDS/registry-harvest-service/releases/download/v${registry_harvest_service_version}/registry-harvest-service-${registry_harvest_service_version}-bin.tar.gz
 
