@@ -81,7 +81,7 @@ jobs:
             -
                 name: 🏷 Image Tag Determination
                 id: tagger
-                run: echo "::set-output name=image_tag::$(echo ${{github.ref}} | awk -F/ '{print $NF}')"
+                run: echo "image_tag=$(echo ${{github.ref}} | awk -F/ '{print $NF}')" >> $GITHUB_OUTPUT
             -
                 name: 🏞 Image Generation
                 uses: peter-evans/repository-dispatch@v1
