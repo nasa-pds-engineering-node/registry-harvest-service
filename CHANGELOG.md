@@ -1,8 +1,16 @@
 # Changelog
 
-## [release/1.1.5](https://github.com/NASA-PDS/registry-harvest-service/tree/release/1.1.5) (2023-04-03)
+## [«unknown»](https://github.com/NASA-PDS/registry-harvest-service/tree/«unknown») (2023-05-09)
 
-[Full Changelog](https://github.com/NASA-PDS/registry-harvest-service/compare/v1.1.4...release/1.1.5)
+[Full Changelog](https://github.com/NASA-PDS/registry-harvest-service/compare/v1.1.5...«unknown»)
+
+**Defects:**
+
+- Stable Roundup can no longer trigger Imaging workflow [\#27](https://github.com/NASA-PDS/registry-harvest-service/issues/27)
+
+## [v1.1.5](https://github.com/NASA-PDS/registry-harvest-service/tree/v1.1.5) (2023-04-03)
+
+[Full Changelog](https://github.com/NASA-PDS/registry-harvest-service/compare/v1.1.4...v1.1.5)
 
 ## [v1.1.4](https://github.com/NASA-PDS/registry-harvest-service/tree/v1.1.4) (2022-12-13)
 
