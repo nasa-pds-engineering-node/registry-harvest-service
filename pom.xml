@@ -118,7 +118,7 @@ Go through this file line-by-line and replace the template values with your own.
         <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-core</artifactId>
-            <version>1.23</version>
+            <version>1.28.3</version>
         </dependency>
         <!-- Log4j logger -->
         <dependency>
