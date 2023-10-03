@@ -47,7 +47,7 @@ FROM openjdk:11-slim
 # from the GitHub releases. However, you can override this, such as with a
 # `file:` URL, to a locally built release if you're testing out changes.
 
-ARG regisrty_harvest_service_url=https://github.com/NASA-PDS/registry-harvest-service/releases/download/v1.2.0/registry-harvest-service-1.2.0-bin.tar.gz
+ARG registry_harvest_service_url=https://github.com/NASA-PDS/registry-harvest-service/releases/download/v1.2.0/registry-harvest-service-1.2.0-bin.tar.gz
 
 
 # Image Layers
@@ -60,7 +60,7 @@ ARG regisrty_harvest_service_url=https://github.com/NASA-PDS/registry-harvest-se
 RUN : &&\
     apt-get update --quiet --yes &&\
     apt-get install --quiet --yes curl &&\
-    curl --verbose --location --fail "$regisrty_harvest_service_url" >/tmp/registry-harvest-service-bin.tar.gz &&\
+    curl --verbose --location --fail "$registry_harvest_service_url" >/tmp/registry-harvest-service-bin.tar.gz &&\
     : Sanity check to make sure we got some bytes &&\
     [ -s /tmp/registry-harvest-service-bin.tar.gz ] || exit 1 &&\
     mkdir /opt/registry-harvest-service &&\
