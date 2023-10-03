@@ -38,6 +38,8 @@
 
 FROM openjdk:11-slim
 
+# Set the following argument with a compatible Registry Harvest Service version
+# ARG registry_harvest_service_version=1.2.1
 
 # Build Arguments
 # ---------------
@@ -46,8 +48,7 @@ FROM openjdk:11-slim
 # binary distribution. By default, that'll be version 1.2.0 taken
 # from the GitHub releases. However, you can override this, such as with a
 # `file:` URL, to a locally built release if you're testing out changes.
-
-ARG registry_harvest_service_url=https://github.com/NASA-PDS/registry-harvest-service/releases/download/v1.2.0/registry-harvest-service-1.2.0-bin.tar.gz
+# ARG registry_harvest_service_url=https://github.com/NASA-PDS/registry-harvest-service/releases/download/v1.2.0/registry-harvest-service-1.2.0-bin.tar.gz
 
 
 # Image Layers
