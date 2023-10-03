@@ -39,7 +39,7 @@
 FROM openjdk:11-slim
 
 # Set the following argument with a compatible Registry Harvest Service version
-ARG registry_harvest_service_version=1.2.1-SNAPSHOT
+ARG registry_harvest_service_version=1.2.1
 
 # Build Arguments
 # ---------------
