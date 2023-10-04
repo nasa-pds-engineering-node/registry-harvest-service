@@ -1,20 +1,40 @@
 # Changelog
 
+## [release/1.2.1](https://github.com/NASA-PDS/registry-harvest-service/tree/release/1.2.1) (2023-10-03)
+
+[Full Changelog](https://github.com/NASA-PDS/registry-harvest-service/compare/v1.2.0...release/1.2.1)
+
 ## [v1.2.0](https://github.com/NASA-PDS/registry-harvest-service/tree/v1.2.0) (2023-10-02)
 
-[Full Changelog](https://github.com/NASA-PDS/registry-harvest-service/compare/v1.1.5...v1.2.0)
+[Full Changelog](https://github.com/NASA-PDS/registry-harvest-service/compare/release/1.2.0...v1.2.0)
+
+## [release/1.2.0](https://github.com/NASA-PDS/registry-harvest-service/tree/release/1.2.0) (2023-10-02)
+
+[Full Changelog](https://github.com/NASA-PDS/registry-harvest-service/compare/release/1.1.6...release/1.2.0)
 
 **Defects:**
 
 - Stable Roundup can no longer trigger Imaging workflow [\#27](https://github.com/NASA-PDS/registry-harvest-service/issues/27)
 
+## [release/1.1.6](https://github.com/NASA-PDS/registry-harvest-service/tree/release/1.1.6) (2023-04-03)
+
+[Full Changelog](https://github.com/NASA-PDS/registry-harvest-service/compare/v1.1.5...release/1.1.6)
+
 ## [v1.1.5](https://github.com/NASA-PDS/registry-harvest-service/tree/v1.1.5) (2023-04-03)
 
-[Full Changelog](https://github.com/NASA-PDS/registry-harvest-service/compare/v1.1.4...v1.1.5)
+[Full Changelog](https://github.com/NASA-PDS/registry-harvest-service/compare/release/1.1.5...v1.1.5)
+
+## [release/1.1.5](https://github.com/NASA-PDS/registry-harvest-service/tree/release/1.1.5) (2023-04-03)
+
+[Full Changelog](https://github.com/NASA-PDS/registry-harvest-service/compare/v1.1.4...release/1.1.5)
 
 ## [v1.1.4](https://github.com/NASA-PDS/registry-harvest-service/tree/v1.1.4) (2022-12-13)
 
-[Full Changelog](https://github.com/NASA-PDS/registry-harvest-service/compare/v1.1.2...v1.1.4)
+[Full Changelog](https://github.com/NASA-PDS/registry-harvest-service/compare/release/1.1.4...v1.1.4)
+
+## [release/1.1.4](https://github.com/NASA-PDS/registry-harvest-service/tree/release/1.1.4) (2022-12-13)
+
+[Full Changelog](https://github.com/NASA-PDS/registry-harvest-service/compare/v1.1.2...release/1.1.4)
 
 ## [v1.1.2](https://github.com/NASA-PDS/registry-harvest-service/tree/v1.1.2) (2022-11-09)
 
