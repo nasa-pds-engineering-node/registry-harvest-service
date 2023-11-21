@@ -36,7 +36,7 @@
 #
 # This is Java, so we'll start off with a nice slim version of OpenJDK, 11.
 
-FROM openjdk:11-slim
+FROM openjdk:18-slim
 
 # Set the following argument with a compatible Registry Harvest Service version
 ARG registry_harvest_service_version=1.2.1
