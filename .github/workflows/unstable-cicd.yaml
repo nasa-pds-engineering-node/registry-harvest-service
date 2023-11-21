@@ -79,7 +79,7 @@ jobs:
                     ADMIN_GITHUB_TOKEN: ${{secrets.ADMIN_GITHUB_TOKEN}}
             -
                 name: 💳 Docker Hub Identification
-                uses: docker/login-action@v2
+                uses: docker/login-action@v3
                 with:
                     username: ${{secrets.DOCKERHUB_USERNAME}}
                     password: ${{secrets.DOCKERHUB_TOKEN}}
