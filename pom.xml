@@ -55,7 +55,7 @@ Go through this file line-by-line and replace the template values with your own.
     <parent>
         <groupId>gov.nasa</groupId>
         <artifactId>pds</artifactId>
-        <version>1.13.0</version>
+        <version>1.14.0</version>
     </parent>
   
     <properties>
