@@ -195,7 +195,7 @@ Go through this file line-by-line and replace the template values with your own.
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>2.2.5.RELEASE</version>
+                <version>3.2.0</version>
                 <configuration>
                     <mainClass>gov.nasa.pds.harvest.HarvestServerMain</mainClass>
                     <layout>JAR</layout>
