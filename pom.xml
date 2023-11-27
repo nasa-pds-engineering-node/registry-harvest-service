@@ -163,7 +163,7 @@ Go through this file line-by-line and replace the template values with your own.
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlet</artifactId>
-            <version>9.4.44.v20210927</version>
+            <version>11.0.18</version>
         </dependency>
         <!-- Registry Common library -->
         <dependency>
