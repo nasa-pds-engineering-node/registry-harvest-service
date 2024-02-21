@@ -152,7 +152,7 @@ Go through this file line-by-line and replace the template values with your own.
         <dependency>
             <groupId>com.rabbitmq</groupId>
             <artifactId>amqp-client</artifactId>
-            <version>5.13.1</version>
+            <version>5.18.0</version>
         </dependency>
         <!-- Web server -->
         <dependency>
